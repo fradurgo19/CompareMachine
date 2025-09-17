@@ -1,0 +1,302 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "CompareMachine API",
+    "description": "API para el sistema de comparación de maquinaria pesada con evaluación de criterios de juntas",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Frank Duran",
+      "email": "fradurgo19@example.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001",
+      "description": "Servidor de desarrollo"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "description": "Verificar el estado del servidor",
+        "responses": {
+          "200": {
+            "description": "Servidor funcionando correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "timestamp": { "type": "string" },
+                    "version": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "summary": "Registrar usuario",
+        "description": "Crear una nueva cuenta de usuario",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "email", "password"],
+                "properties": {
+                  "name": { "type": "string", "minLength": 2 },
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "minLength": 8 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario registrado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": { "$ref": "#/components/schemas/User" },
+                        "token": { "type": "string" }
+                      }
+                    },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Iniciar sesión",
+        "description": "Autenticar usuario y obtener token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login exitoso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": { "$ref": "#/components/schemas/User" },
+                        "token": { "type": "string" }
+                      }
+                    },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/machinery": {
+      "get": {
+        "summary": "Obtener maquinaria",
+        "description": "Listar maquinaria con filtros y paginación",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 12 }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "manufacturer",
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de maquinaria",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Machinery" }
+                    },
+                    "meta": { "$ref": "#/components/schemas/Pagination" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/joint-evaluations/calculate": {
+      "post": {
+        "summary": "Calcular evaluación de junta",
+        "description": "Calcular resultados de evaluación de junta sin guardar",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["standardDiameter", "structureHousingDiameter", "bushingDiameter", "pinDiameter"],
+                "properties": {
+                  "standardDiameter": { "type": "number" },
+                  "structureHousingDiameter": { "type": "number" },
+                  "bushingDiameter": { "type": "number" },
+                  "pinDiameter": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cálculos realizados exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": { "$ref": "#/components/schemas/JointEvaluationResult" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "role": { "type": "string", "enum": ["ADMIN", "USER"] },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Machinery": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "model": { "type": "string" },
+          "series": { "type": "string" },
+          "category": { "type": "string" },
+          "manufacturer": { "type": "string" },
+          "images": { "type": "array", "items": { "type": "string" } },
+          "price": { "type": "number" },
+          "availability": { "type": "string", "enum": ["AVAILABLE", "LIMITED", "UNAVAILABLE"] },
+          "rating": { "type": "number" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "specifications": { "$ref": "#/components/schemas/MachinerySpecifications" }
+        }
+      },
+      "MachinerySpecifications": {
+        "type": "object",
+        "properties": {
+          "weight": { "type": "number" },
+          "power": { "type": "number" },
+          "maxOperatingWeight": { "type": "number" },
+          "bucketCapacity": { "type": "number" },
+          "maxDigDepth": { "type": "number" },
+          "maxReach": { "type": "number" },
+          "transportLength": { "type": "number" },
+          "transportWidth": { "type": "number" },
+          "transportHeight": { "type": "number" },
+          "engineModel": { "type": "string" },
+          "fuelCapacity": { "type": "number" },
+          "hydraulicSystem": { "type": "string" }
+        }
+      },
+      "JointEvaluationResult": {
+        "type": "object",
+        "properties": {
+          "criterion": { "type": "number" },
+          "aeResult": { "type": "number" },
+          "apResult": { "type": "number" },
+          "epResult": { "type": "number" },
+          "beResult": { "type": "number" },
+          "bpResult": { "type": "number" },
+          "criteria": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "total": { "type": "integer" },
+          "page": { "type": "integer" },
+          "limit": { "type": "integer" },
+          "totalPages": { "type": "integer" }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ]
+}

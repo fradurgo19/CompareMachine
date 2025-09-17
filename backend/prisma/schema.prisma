@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  jointEvaluations JointEvaluation[]
+  machinery        Machinery[]
+
+  @@map("users")
+}
+
+model Machinery {
+  id           String            @id @default(cuid())
+  name         String
+  model        String
+  series       String
+  category     MachineryCategory
+  manufacturer String
+  images       String[]
+  price        Float?
+  availability Availability
+  rating       Float             @default(0)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  // Relations
+  specifications MachinerySpecifications?
+  userId         String?
+  user           User?            @relation(fields: [userId], references: [id])
+
+  @@unique([name, model])
+  @@map("machinery")
+}
+
+model MachinerySpecifications {
+  id                    String  @id @default(cuid())
+  weight                Float
+  power                 Float
+  maxOperatingWeight    Float
+  bucketCapacity        Float?
+  maxDigDepth           Float?
+  maxReach              Float?
+  transportLength       Float
+  transportWidth        Float
+  transportHeight       Float
+  engineModel           String
+  fuelCapacity          Float
+  hydraulicSystem       String?
+
+  // Relations
+  machineryId String    @unique
+  machinery   Machinery @relation(fields: [machineryId], references: [id], onDelete: Cascade)
+
+  @@map("machinery_specifications")
+}
+
+model JointEvaluation {
+  id                        String   @id @default(cuid())
+  joint                     Int
+  standardDiameter          Float
+  structureHousingDiameter  Float
+  bushingDiameter           Float
+  pinDiameter               Float
+  criterion                 Float
+  aeResult                  Int
+  apResult                  Int
+  epResult                  Int
+  beResult                  Int
+  bpResult                  Int
+  criteria                  String[]
+  model                     String
+  series                    String
+  ott                       String
+  photos                    String[]
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([joint, userId])
+  @@map("joint_evaluations")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum MachineryCategory {
+  EXCAVATORS
+  BULLDOZERS
+  LOADERS
+  CRANES
+  DUMP_TRUCKS
+  COMPACTORS
+  GRADERS
+}
+
+enum Availability {
+  AVAILABLE
+  LIMITED
+  UNAVAILABLE
+}
