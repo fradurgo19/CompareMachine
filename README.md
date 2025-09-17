@@ -34,7 +34,9 @@ Un sistema web moderno para comparar y evaluar maquinaria pesada industrial, con
 ## 🏗️ Arquitectura Técnica
 
 ### **Stack Tecnológico**
-- **Frontend:** React 18 + TypeScript + Vite
+
+#### **Frontend**
+- **React 18 + TypeScript + Vite**
 - **Estilos:** Tailwind CSS
 - **Routing:** React Router DOM
 - **Estado:** Context API + React Query
@@ -42,34 +44,81 @@ Un sistema web moderno para comparar y evaluar maquinaria pesada industrial, con
 - **Gráficos:** Recharts
 - **Iconos:** Lucide React
 
+#### **Backend**
+- **Node.js + Express + TypeScript**
+- **Base de datos:** PostgreSQL con Prisma ORM
+- **Autenticación:** JWT
+- **Validación:** Zod
+- **Documentación:** Swagger/OpenAPI
+- **Testing:** Jest + Supertest
+
 ### **Estructura del Proyecto**
 ```
-src/
-├── atoms/          # Componentes básicos reutilizables
-├── molecules/      # Componentes compuestos
-├── organisms/      # Componentes complejos
-├── pages/          # Páginas principales
-├── hooks/          # Lógica personalizada
-├── services/       # API y servicios
-├── types/          # Definiciones TypeScript
-└── context/        # Estado global
+CompareMachine/
+├── src/                    # Frontend React
+│   ├── atoms/              # Componentes básicos reutilizables
+│   ├── molecules/          # Componentes compuestos
+│   ├── organisms/          # Componentes complejos
+│   ├── pages/              # Páginas principales
+│   ├── hooks/              # Lógica personalizada
+│   ├── services/           # API y servicios
+│   ├── types/              # Definiciones TypeScript
+│   └── context/            # Estado global
+├── backend/                # Backend Node.js
+│   ├── src/
+│   │   ├── controllers/    # Controladores de rutas
+│   │   ├── middleware/     # Middleware personalizado
+│   │   ├── routes/         # Definición de rutas
+│   │   ├── services/       # Lógica de negocio
+│   │   ├── types/          # Tipos TypeScript
+│   │   ├── utils/          # Utilidades
+│   │   └── validators/     # Validaciones con Zod
+│   └── prisma/             # Esquema de base de datos
+└── README.md
 ```
 
 ## 🚀 Instalación y Uso
 
 ### **Prerrequisitos**
 - Node.js 18+ 
+- PostgreSQL 13+
 - npm o yarn
 
-### **Instalación**
-```bash
-# Clonar el repositorio
-git clone https://github.com/fradurgo19/CompareMachine.git
+### **Instalación Completa**
 
-# Navegar al directorio
+#### **1. Clonar el repositorio**
+```bash
+git clone https://github.com/fradurgo19/CompareMachine.git
 cd CompareMachine
+```
+
+#### **2. Configurar Backend**
+```bash
+# Navegar al directorio backend
+cd backend
 
 # Instalar dependencias
+npm install
+
+# Configurar variables de entorno
+cp env.example .env
+# Editar .env con tu configuración de base de datos
+
+# Configurar base de datos
+npm run db:generate
+npm run db:migrate
+npm run db:seed
+
+# Iniciar servidor backend
+npm run dev
+```
+
+#### **3. Configurar Frontend**
+```bash
+# Navegar al directorio raíz
+cd ..
+
+# Instalar dependencias del frontend
 npm install
 
 # Iniciar servidor de desarrollo
@@ -77,11 +126,24 @@ npm run dev
 ```
 
 ### **Scripts Disponibles**
+
+#### **Frontend**
 ```bash
 npm run dev      # Servidor de desarrollo
 npm run build    # Build para producción
 npm run preview  # Preview del build
 npm run lint     # Linter de código
+```
+
+#### **Backend**
+```bash
+cd backend
+npm run dev          # Servidor de desarrollo con hot reload
+npm run build        # Compilar TypeScript
+npm start           # Iniciar servidor en producción
+npm run db:generate # Generar cliente Prisma
+npm run db:migrate  # Ejecutar migraciones
+npm run db:seed     # Poblar BD con datos de ejemplo
 ```
 
 ## 📊 Funcionalidades Detalladas
@@ -137,12 +199,36 @@ interface Machinery {
 }
 ```
 
+## 🔌 API Endpoints
+
+### **Autenticación**
+- `POST /api/auth/register` - Registrar usuario
+- `POST /api/auth/login` - Iniciar sesión
+- `GET /api/auth/profile` - Obtener perfil
+
+### **Maquinaria**
+- `GET /api/machinery` - Listar maquinaria (con filtros y paginación)
+- `GET /api/machinery/:id` - Obtener maquinaria por ID
+- `POST /api/machinery` - Crear maquinaria (requiere admin)
+- `PUT /api/machinery/:id` - Actualizar maquinaria (requiere admin)
+- `DELETE /api/machinery/:id` - Eliminar maquinaria (requiere admin)
+- `GET /api/machinery/manufacturers` - Obtener lista de fabricantes
+
+### **Evaluaciones de Juntas**
+- `GET /api/joint-evaluations` - Listar evaluaciones
+- `POST /api/joint-evaluations` - Crear evaluación
+- `POST /api/joint-evaluations/calculate` - Calcular evaluación sin guardar
+
+### **Documentación API**
+- **Swagger UI:** `http://localhost:3001/api-docs`
+- **Health Check:** `http://localhost:3001/health`
+
 ## 📈 Roadmap
 
-- [ ] **Integración con base de datos real**
-- [ ] **Sistema de autenticación de usuarios**
+- [x] **Integración con base de datos real** ✅
+- [x] **Sistema de autenticación de usuarios** ✅
+- [x] **API REST completa** ✅
 - [ ] **Panel de administración avanzado**
-- [ ] **API REST completa**
 - [ ] **Notificaciones en tiempo real**
 - [ ] **Sistema de reportes avanzado**
 - [ ] **Integración con sistemas ERP**
