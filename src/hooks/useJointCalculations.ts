@@ -32,30 +32,30 @@ export const calculateJointResults = ({
     // CRITERIA formulas (three conditional formulas combined)
     const criteria: string[] = [];
 
-    // First condition: IF(G4=1,"MAQUINAR","",IF(H4=1,IF((D4-C4)>(C4-F4),"MAQUINAR","CAMBIAR PIN"),""))
+    // First condition: IF(G4=1,"MAQUINAR","",IF(H4=1,IF((D4-C4)>(C4-F4),"MAQUINAR","CAMBIAR PASADOR"),""))
     if (aeResult === 1) {
       criteria.push("MAQUINAR");
     } else if (apResult === 1) {
       if ((structureHousingDiameter - standardDiameter) > (standardDiameter - pinDiameter)) {
         criteria.push("MAQUINAR");
       } else {
-        criteria.push("CAMBIAR PIN");
+        criteria.push("CAMBIAR PASADOR");
       }
     }
 
-    // Second condition: IF(I4=1,"CAMBIAR PIN","")
+    // Second condition: IF(I4=1,"CAMBIAR PASADOR","")
     if (epResult === 1) {
-      criteria.push("CAMBIAR PIN");
+      criteria.push("CAMBIAR PASADOR");
     }
 
-    // Third condition: IF(J4=1,"CAMBIAR BOCINAS",IF(K4=1,IF((E4-C4)>(C4-F4),"CAMBIAR BOCINAS","CAMBIAR PIN"),""))
+    // Third condition: IF(J4=1,"CAMBIAR BUJES",IF(K4=1,IF((E4-C4)>(C4-F4),"CAMBIAR BUJES","CAMBIAR PASADOR"),""))
     if (beResult === 1) {
-      criteria.push("CAMBIAR BOCINAS");
+      criteria.push("CAMBIAR BUJES");
     } else if (bpResult === 1) {
       if ((bushingDiameter - standardDiameter) > (standardDiameter - pinDiameter)) {
-        criteria.push("CAMBIAR BOCINAS");
+        criteria.push("CAMBIAR BUJES");
       } else {
-        criteria.push("CAMBIAR PIN");
+        criteria.push("CAMBIAR PASADOR");
       }
     }
 

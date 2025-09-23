@@ -19,6 +19,24 @@ interface JointEvaluationRow {
   photos: FileList | null;
 }
 
+// Utility function to convert file to base64
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
+  });
+};
+
+// Utility function to convert multiple files to base64
+const filesToBase64 = async (files: FileList | null): Promise<string[]> => {
+  if (!files || files.length === 0) return [];
+  
+  const promises = Array.from(files).map(file => fileToBase64(file));
+  return Promise.all(promises);
+};
+
 const CriteriaEvaluation: React.FC = () => {
   const [evaluations, setEvaluations] = useState<JointEvaluationRow[]>([
     {
@@ -68,7 +86,7 @@ const CriteriaEvaluation: React.FC = () => {
     );
   }, []);
 
-  const exportToCSV = () => {
+  const exportToCSV = async () => {
     const headers = [
       'ARTICULACIÓN',
       'CRITERIO', 
@@ -84,16 +102,22 @@ const CriteriaEvaluation: React.FC = () => {
       'CRITERIOS',
       'MODELO',
       'SERIE',
-      'OTT'
+      'OTT',
+      'FOTOS_BASE64'
     ];
 
-    const rows = evaluations.map(evaluation => {
+    const rows = await Promise.all(evaluations.map(async evaluation => {
       const calculations = calculateJointResults({
         standardDiameter: evaluation.standardDiameter,
         structureHousingDiameter: evaluation.structureHousingDiameter,
         bushingDiameter: evaluation.bushingDiameter,
         pinDiameter: evaluation.pinDiameter
       });
+
+      const photoBase64 = await filesToBase64(evaluation.photos);
+      const photosData = photoBase64.length > 0 
+        ? photoBase64.join(' | ') // Separate multiple photos with |
+        : 'Sin fotos';
 
       return [
         evaluation.joint,
@@ -110,9 +134,10 @@ const CriteriaEvaluation: React.FC = () => {
         calculations.criteria.join('; '),
         evaluation.model,
         evaluation.series,
-        evaluation.ott
+        evaluation.ott,
+        photosData
       ];
-    });
+    }));
 
     const csvContent = [headers, ...rows]
       .map(row => row.map(cell => `"${cell}"`).join(','))
@@ -129,14 +154,19 @@ const CriteriaEvaluation: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  const handleExportToPDF = () => {
-    const pdfData = evaluations.map(evaluation => {
+  const handleExportToPDF = async () => {
+    const pdfData = await Promise.all(evaluations.map(async evaluation => {
       const calculations = calculateJointResults({
         standardDiameter: evaluation.standardDiameter,
         structureHousingDiameter: evaluation.structureHousingDiameter,
         bushingDiameter: evaluation.bushingDiameter,
         pinDiameter: evaluation.pinDiameter
       });
+
+      const photoBase64 = await filesToBase64(evaluation.photos);
+      const photoNames = evaluation.photos && evaluation.photos.length > 0 
+        ? Array.from(evaluation.photos).map(photo => photo.name).join('; ')
+        : 'Sin fotos';
 
       return {
         joint: evaluation.joint,
@@ -153,9 +183,11 @@ const CriteriaEvaluation: React.FC = () => {
         criteria: calculations.criteria,
         model: evaluation.model,
         series: evaluation.series,
-        ott: evaluation.ott
+        ott: evaluation.ott,
+        photos: photoNames,
+        photosBase64: photoBase64
       };
-    });
+    }));
 
     exportToPDF(pdfData);
   };
@@ -216,11 +248,11 @@ const CriteriaEvaluation: React.FC = () => {
               <div className="min-w-[140px]">DIÁMETRO ALOJAMIENTO</div>
               <div className="min-w-[120px]">DIÁMETRO BOCINA</div>
               <div className="min-w-[100px]">DIÁMETRO PIN</div>
-              <div className="min-w-[30px]">A-E</div>
               <div className="col-span-2 min-w-[200px]">CRITERIOS</div>
               <div className="min-w-[100px]">MODELO</div>
               <div className="min-w-[100px]">SERIE</div>
               <div className="min-w-[80px]">OTT</div>
+              <div className="min-w-[120px]">FOTO</div>
               <div className="min-w-[100px]">ACCIONES</div>
             </div>
 
@@ -341,7 +373,33 @@ const EvaluationRow: React.FC<EvaluationRowProps> = ({
   canRemove
 }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdate(evaluation.id, 'photos', e.target.files);
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      // If there are existing photos, append new ones
+      if (evaluation.photos && evaluation.photos.length > 0) {
+        const existingFiles = Array.from(evaluation.photos);
+        const newFiles = Array.from(files);
+        const combinedFiles = [...existingFiles, ...newFiles];
+        
+        // Create a new FileList-like object
+        const dataTransfer = new DataTransfer();
+        combinedFiles.forEach(file => dataTransfer.items.add(file));
+        onUpdate(evaluation.id, 'photos', dataTransfer.files);
+      } else {
+        onUpdate(evaluation.id, 'photos', files);
+      }
+    }
+  };
+
+  const removePhoto = (indexToRemove: number) => {
+    if (evaluation.photos && evaluation.photos.length > 0) {
+      const files = Array.from(evaluation.photos);
+      files.splice(indexToRemove, 1);
+      
+      const dataTransfer = new DataTransfer();
+      files.forEach(file => dataTransfer.items.add(file));
+      onUpdate(evaluation.id, 'photos', dataTransfer.files);
+    }
   };
 
   return (
@@ -407,11 +465,6 @@ const EvaluationRow: React.FC<EvaluationRowProps> = ({
         />
       </div>
 
-      {/* Calculated Results - Only A-E visible */}
-      <div className="min-w-[30px] text-center font-medium text-green-600">
-        {calculations.aeResult}
-      </div>
-
       {/* Criteria Results */}
       <div className="col-span-2 min-w-[200px] text-xs">
         {calculations.criteria.length > 0 ? (
@@ -461,9 +514,52 @@ const EvaluationRow: React.FC<EvaluationRowProps> = ({
         />
       </div>
 
+      {/* Photo Display */}
+      <div className="min-w-[120px]">
+        {evaluation.photos && evaluation.photos.length > 0 ? (
+          <div className="space-y-1">
+            <div className="flex flex-wrap gap-1">
+              {Array.from(evaluation.photos).map((photo, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={URL.createObjectURL(photo)}
+                    alt={`Foto ${index + 1}`}
+                    className="w-8 h-8 object-cover rounded border border-gray-200 cursor-pointer hover:border-blue-400 transition-colors"
+                    title={`${photo.name} (${(photo.size / 1024).toFixed(1)} KB)`}
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded transition-all duration-200 flex items-center justify-center">
+                    <span className="text-white text-xs opacity-0 group-hover:opacity-100 font-medium">
+                      {index + 1}
+                    </span>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removePhoto(index);
+                    }}
+                    className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    title="Eliminar foto"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="text-xs text-gray-500">
+              {evaluation.photos.length} foto{evaluation.photos.length !== 1 ? 's' : ''} adjunta{evaluation.photos.length !== 1 ? 's' : ''}
+            </div>
+          </div>
+        ) : (
+          <div className="text-center">
+            <span className="text-gray-400 text-xs">Sin fotos</span>
+            <div className="text-xs text-gray-300 mt-1">Adjuntar con botón Foto</div>
+          </div>
+        )}
+      </div>
+
       {/* Actions */}
       <div className="min-w-[100px] flex items-center gap-2">
-        <label className="cursor-pointer">
+        <label className="cursor-pointer group">
           <input
             type="file"
             multiple
@@ -471,13 +567,17 @@ const EvaluationRow: React.FC<EvaluationRowProps> = ({
             onChange={handleFileChange}
             className="hidden"
           />
-          <Upload className="w-4 h-4 text-gray-400 hover:text-blue-600 transition-colors" />
+          <div className="flex items-center gap-1 px-2 py-1 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded text-blue-700 hover:text-blue-800 transition-all duration-200">
+            <Upload className="w-4 h-4" />
+            <span className="text-xs font-medium">Foto</span>
+          </div>
         </label>
         
         {canRemove && (
           <button
             onClick={() => onRemove(evaluation.id)}
-            className="text-red-400 hover:text-red-600 transition-colors"
+            className="text-red-400 hover:text-red-600 transition-colors p-1 hover:bg-red-50 rounded"
+            title="Eliminar articulación"
           >
             <Trash2 className="w-4 h-4" />
           </button>
