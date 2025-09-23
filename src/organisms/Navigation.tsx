@@ -53,7 +53,11 @@ const Navigation: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo and Title */}
           <div className="flex items-center">
-            <Settings className="w-8 h-8 text-blue-600 mr-3" />
+            <img 
+              src="https://res.cloudinary.com/dbufrzoda/image/upload/v1750457354/Captura_de_pantalla_2025-06-20_170819_wzmyli.png"
+              alt="Logo de la empresa"
+              className="w-24 h-24 mr-4 object-contain"
+            />
             <div>
               <h1 className="text-xl font-bold text-gray-900">
                 Comparador de Maquinaria Pesada

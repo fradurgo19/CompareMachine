@@ -48,9 +48,11 @@ const Landing: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                <GitCompare className="w-6 h-6 text-white" />
-              </div>
+              <img 
+                src="https://res.cloudinary.com/dbufrzoda/image/upload/v1750457354/Captura_de_pantalla_2025-06-20_170819_wzmyli.png"
+                alt="Logo de la empresa"
+                className="w-24 h-24 mr-4 object-contain"
+              />
               <div>
                 <h1 className="text-xl font-bold text-gray-900">
                   Comparador de Maquinaria Pesada
@@ -189,9 +191,11 @@ const Landing: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex items-center justify-center mb-4">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                <GitCompare className="w-5 h-5 text-white" />
-              </div>
+              <img 
+                src="https://res.cloudinary.com/dbufrzoda/image/upload/v1750457354/Captura_de_pantalla_2025-06-20_170819_wzmyli.png"
+                alt="Logo de la empresa"
+                className="w-18 h-18 mr-3 object-contain"
+              />
               <span className="text-white font-semibold">Comparador de Maquinaria Pesada</span>
             </div>
             <p className="text-gray-400">

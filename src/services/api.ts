@@ -22,7 +22,7 @@ class ApiService {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit & { skipAuth?: boolean } = {}
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
     
@@ -30,17 +30,19 @@ class ApiService {
       'Content-Type': 'application/json',
     };
 
-    // Add authorization header if token exists
+    // Add authorization header if token exists and skipAuth is not true
     const token = localStorage.getItem('authToken');
-    if (token) {
+    if (token && !options.skipAuth) {
       defaultHeaders['Authorization'] = `Bearer ${token}`;
     }
 
+    const { skipAuth, ...requestOptions } = options;
+
     const config: RequestInit = {
-      ...options,
+      ...requestOptions,
       headers: {
         ...defaultHeaders,
-        ...options.headers,
+        ...requestOptions.headers,
       },
     };
 
@@ -94,7 +96,8 @@ class ApiService {
     const queryString = queryParams.toString();
     const endpoint = queryString ? `/machinery?${queryString}` : '/machinery';
     
-    return this.request(endpoint);
+    // This is a public endpoint, don't send authorization header
+    return this.request(endpoint, { skipAuth: true });
   }
 
   async getMachineryById(id: string): Promise<ApiResponse<any>> {
@@ -102,7 +105,8 @@ class ApiService {
   }
 
   async getManufacturers(): Promise<ApiResponse<string[]>> {
-    return this.request('/machinery/manufacturers');
+    // This is a public endpoint, don't send authorization header
+    return this.request('/machinery/manufacturers', { skipAuth: true });
   }
 
   async createMachinery(data: any): Promise<ApiResponse<any>> {

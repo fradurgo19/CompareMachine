@@ -20,9 +20,9 @@ const initialState: AppState = {
   filters: {
     category: 'all',
     manufacturer: '',
-    priceRange: [0, 1000000],
-    weightRange: [0, 100],
-    powerRange: [0, 1000],
+    priceRange: [0, 10000000],
+    weightRange: [0, 1000000],
+    powerRange: [0, 1000000],
     availability: 'all',
   },
   sortBy: {

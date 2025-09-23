@@ -59,8 +59,12 @@ const Login: React.FC = () => {
             Volver al inicio
           </Link>
           
-          <div className="mx-auto h-12 w-12 bg-blue-600 rounded-full flex items-center justify-center">
-            <LogIn className="h-6 w-6 text-white" />
+          <div className="mx-auto h-30 w-30 flex items-center justify-center">
+            <img 
+              src="https://res.cloudinary.com/dbufrzoda/image/upload/v1750457354/Captura_de_pantalla_2025-06-20_170819_wzmyli.png"
+              alt="Logo de la empresa"
+              className="h-30 w-30 object-contain"
+            />
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
             Iniciar Sesión
