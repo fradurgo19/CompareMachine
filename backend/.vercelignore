@@ -1,0 +1,11 @@
+# Ignorar archivos innecesarios para Vercel
+node_modules
+.env
+.env.local
+.env.production
+*.log
+.DS_Store
+dist
+coverage
+.nyc_output
+

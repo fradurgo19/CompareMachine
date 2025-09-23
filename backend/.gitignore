@@ -105,3 +105,4 @@ uploads/
 # Test files
 *.test.ts
 *.spec.ts
+.vercel

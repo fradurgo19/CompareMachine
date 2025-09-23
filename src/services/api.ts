@@ -1,5 +1,7 @@
 // API service for connecting to the backend
-const API_BASE_URL = 'http://localhost:3001/api';
+import config from '../config/environment';
+
+const API_BASE_URL = config.apiUrl;
 
 interface ApiResponse<T> {
   success: boolean;

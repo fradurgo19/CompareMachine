@@ -40,13 +40,38 @@ const limiter = rateLimit({
   message: {
     success: false,
     message: 'Demasiadas solicitudes desde esta IP, por favor intenta más tarde.'
-  }
+  },
+  keyGenerator: (req) => {
+    // Use X-Forwarded-For header for Vercel
+    return req.ip || req.connection.remoteAddress || 'unknown';
+  },
+  standardHeaders: true,
+  legacyHeaders: false
 });
 
 // Middleware
 app.use(helmet());
+
+// Configuración de CORS dinámica
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+  ? [
+      'https://compare-machine-frontend.vercel.app',
+      'https://compare-machine.vercel.app',
+      'https://tu-dominio-personalizado.com'
+    ]
+  : ['http://localhost:5173'];
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Permitir requests sin origin (como mobile apps o curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('No permitido por CORS'), false);
+    }
+  },
   credentials: true
 }));
 app.use(morgan('combined'));
