@@ -10,7 +10,7 @@ export interface Machinery {
   images: string[];
   specifications: MachinerySpecifications;
   price?: number;
-  availability: 'available' | 'limited' | 'unavailable';
+  availability: 'AVAILABLE' | 'LIMITED' | 'UNAVAILABLE';
   rating: number;
   createdAt: string;
 }
@@ -31,13 +31,13 @@ export interface MachinerySpecifications {
 }
 
 export type MachineryCategory = 
-  | 'excavators'
-  | 'bulldozers'
-  | 'loaders'
-  | 'cranes'
-  | 'dump-trucks'
-  | 'compactors'
-  | 'graders';
+  | 'EXCAVATORS'
+  | 'BULLDOZERS'
+  | 'LOADERS'
+  | 'CRANES'
+  | 'DUMP_TRUCKS'
+  | 'COMPACTORS'
+  | 'GRADERS';
 
 export interface ComparisonItem extends Machinery {
   isSelected: boolean;
@@ -69,7 +69,7 @@ export interface FilterOptions {
   priceRange: [number, number];
   weightRange: [number, number];
   powerRange: [number, number];
-  availability: 'all' | 'available' | 'limited';
+  availability: 'all' | 'AVAILABLE' | 'LIMITED';
 }
 
 export interface SortOptions {

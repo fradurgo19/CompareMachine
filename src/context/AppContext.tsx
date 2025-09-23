@@ -44,7 +44,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         comparisonMode: !state.comparisonMode,
-        selectedMachinery: !state.comparisonMode ? state.selectedMachinery : [],
+        // NO limpiar las máquinas seleccionadas al activar/desactivar modo comparación
       };
     case 'UPDATE_FILTERS':
       return {
@@ -69,9 +69,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
     comparisonMode: state.comparisonMode,
     filters: state.filters,
     sortBy: state.sortBy,
-    setSelectedMachinery: (ids: string[]) =>
-      dispatch({ type: 'SET_SELECTED_MACHINERY', payload: ids }),
-    toggleComparisonMode: () => dispatch({ type: 'TOGGLE_COMPARISON_MODE' }),
+    setSelectedMachinery: (ids: string[]) => {
+      console.log('setSelectedMachinery called with:', ids, 'current comparisonMode:', state.comparisonMode);
+      dispatch({ type: 'SET_SELECTED_MACHINERY', payload: ids });
+      // Solo desactivar modo comparación si no hay máquinas seleccionadas
+      if (ids.length === 0 && state.comparisonMode) {
+        console.log('Desactivando modo comparación porque no hay máquinas seleccionadas');
+        dispatch({ type: 'TOGGLE_COMPARISON_MODE' });
+      }
+      // NO activar automáticamente el modo comparación - debe ser manual
+    },
+    toggleComparisonMode: () => {
+      console.log('toggleComparisonMode called, current mode:', state.comparisonMode);
+      dispatch({ type: 'TOGGLE_COMPARISON_MODE' });
+    },
     updateFilters: (filters: Partial<FilterOptions>) =>
       dispatch({ type: 'UPDATE_FILTERS', payload: filters }),
     updateSort: (sort: SortOptions) =>

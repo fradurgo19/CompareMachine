@@ -18,7 +18,7 @@ interface MachineryFormData {
   category: MachineryCategory;
   manufacturer: string;
   price?: number;
-  availability: 'available' | 'limited' | 'unavailable';
+  availability: 'AVAILABLE' | 'LIMITED' | 'UNAVAILABLE';
   // Specifications
   weight: number;
   power: number;
@@ -33,30 +33,28 @@ interface MachineryFormData {
   fuelCapacity: number;
   hydraulicSystem?: string;
   // Additional fields
-  description?: string;
 }
 
 const schema = yup.object({
-  name: yup.string().required('Name is required').min(3, 'Name must be at least 3 characters'),
-  model: yup.string().required('Model is required'),
-  series: yup.string().required('Series is required'),
-  category: yup.string().required('Category is required'),
-  manufacturer: yup.string().required('Manufacturer is required'),
-  price: yup.number().positive('Price must be positive').nullable(),
-  availability: yup.string().required('Availability is required'),
-  weight: yup.number().required('Weight is required').positive('Weight must be positive'),
-  power: yup.number().required('Power is required').positive('Power must be positive'),
-  maxOperatingWeight: yup.number().required('Max operating weight is required').positive(),
-  bucketCapacity: yup.number().positive('Bucket capacity must be positive').nullable(),
-  maxDigDepth: yup.number().positive('Max dig depth must be positive').nullable(),
-  maxReach: yup.number().positive('Max reach must be positive').nullable(),
-  transportLength: yup.number().required('Transport length is required').positive(),
-  transportWidth: yup.number().required('Transport width is required').positive(),
-  transportHeight: yup.number().required('Transport height is required').positive(),
-  engineModel: yup.string().required('Engine model is required'),
-  fuelCapacity: yup.number().required('Fuel capacity is required').positive(),
+  name: yup.string().required('El nombre es requerido').min(3, 'El nombre debe tener al menos 3 caracteres'),
+  model: yup.string().required('El modelo es requerido'),
+  series: yup.string().required('La serie es requerida'),
+  category: yup.string().required('La categoría es requerida'),
+  manufacturer: yup.string().required('El fabricante es requerido'),
+  price: yup.number().positive('El precio debe ser positivo').nullable(),
+  availability: yup.string().required('La disponibilidad es requerida'),
+  weight: yup.number().required('El peso es requerido').positive('El peso debe ser positivo'),
+  power: yup.number().required('La potencia es requerida').positive('La potencia debe ser positiva'),
+  maxOperatingWeight: yup.number().required('El peso máximo de operación es requerido').positive(),
+  bucketCapacity: yup.number().positive('La capacidad del balde debe ser positiva').nullable(),
+  maxDigDepth: yup.number().positive('La profundidad máxima de excavación debe ser positiva').nullable(),
+  maxReach: yup.number().positive('El alcance máximo debe ser positivo').nullable(),
+  transportLength: yup.number().required('La longitud de transporte es requerida').positive(),
+  transportWidth: yup.number().required('El ancho de transporte es requerido').positive(),
+  transportHeight: yup.number().required('La altura de transporte es requerida').positive(),
+  engineModel: yup.string().required('El modelo del motor es requerido'),
+  fuelCapacity: yup.number().required('La capacidad de combustible es requerida').positive(),
   hydraulicSystem: yup.string().nullable(),
-  description: yup.string().nullable(),
 });
 
 interface MachineryFormProps {
@@ -83,8 +81,8 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
   } = useForm<MachineryFormData>({
     resolver: yupResolver(schema),
     defaultValues: {
-      availability: 'available',
-      category: 'excavators',
+      availability: 'AVAILABLE',
+      category: 'EXCAVATORS',
       ...initialData
     }
   });
@@ -92,19 +90,19 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
   const selectedCategory = watch('category');
 
   const categoryOptions = [
-    { value: 'excavators', label: 'Excavators' },
-    { value: 'bulldozers', label: 'Bulldozers' },
-    { value: 'loaders', label: 'Loaders' },
-    { value: 'cranes', label: 'Cranes' },
-    { value: 'dump-trucks', label: 'Dump Trucks' },
-    { value: 'compactors', label: 'Compactors' },
-    { value: 'graders', label: 'Graders' },
+    { value: 'EXCAVATORS', label: 'Excavadoras' },
+    { value: 'BULLDOZERS', label: 'Bulldozers' },
+    { value: 'LOADERS', label: 'Cargadores' },
+    { value: 'CRANES', label: 'Grúas' },
+    { value: 'DUMP_TRUCKS', label: 'Volquetes' },
+    { value: 'COMPACTORS', label: 'Compactadores' },
+    { value: 'GRADERS', label: 'Niveladoras' },
   ];
 
   const availabilityOptions = [
-    { value: 'available', label: 'Available' },
-    { value: 'limited', label: 'Limited' },
-    { value: 'unavailable', label: 'Unavailable' },
+    { value: 'AVAILABLE', label: 'Disponible' },
+    { value: 'LIMITED', label: 'Limitado' },
+    { value: 'UNAVAILABLE', label: 'No Disponible' },
   ];
 
   const manufacturerOptions = [
@@ -116,7 +114,7 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
     { value: 'Hitachi', label: 'Hitachi' },
     { value: 'Case', label: 'Case' },
     { value: 'JCB', label: 'JCB' },
-    { value: 'Other', label: 'Other' },
+    { value: 'Other', label: 'Otro' },
   ];
 
   const onFormSubmit = async (data: MachineryFormData) => {
@@ -127,15 +125,15 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
     }
   };
 
-  const showExcavatorFields = selectedCategory === 'excavators';
-  const showLoaderFields = selectedCategory === 'loaders';
+  const showExcavatorFields = selectedCategory === 'EXCAVATORS';
+  const showLoaderFields = selectedCategory === 'LOADERS';
 
   return (
     <div className="max-w-4xl mx-auto">
       <Card>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">
-            {initialData ? 'Edit Machinery' : 'Add New Machinery'}
+            {initialData ? 'Editar Maquinaria' : 'Agregar Nueva Maquinaria'}
           </h2>
           <Button variant="ghost" onClick={onCancel}>
             <X className="w-5 h-5" />
@@ -145,52 +143,52 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
         <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-8">
           {/* Basic Information */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Información Básica</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
-                label="Machinery Name *"
+                label="Nombre de la Maquinaria *"
                 {...register('name')}
                 error={errors.name?.message}
-                placeholder="e.g., CAT 320 Hydraulic Excavator"
+                placeholder="ej., Excavadora Hidráulica CAT 320"
               />
               
               <Input
-                label="Model *"
+                label="Modelo *"
                 {...register('model')}
                 error={errors.model?.message}
                 placeholder="e.g., 320"
               />
               
               <Input
-                label="Series *"
+                label="Serie *"
                 {...register('series')}
                 error={errors.series?.message}
-                placeholder="e.g., Next Generation"
+                placeholder="ej., Nueva Generación"
               />
               
               <Select
-                label="Category *"
+                label="Categoría *"
                 options={categoryOptions}
                 {...register('category')}
                 error={errors.category?.message}
               />
               
               <Select
-                label="Manufacturer *"
+                label="Fabricante *"
                 options={manufacturerOptions}
                 {...register('manufacturer')}
                 error={errors.manufacturer?.message}
               />
               
               <Select
-                label="Availability *"
+                label="Disponibilidad *"
                 options={availabilityOptions}
                 {...register('availability')}
                 error={errors.availability?.message}
               />
               
               <Input
-                label="Price (USD)"
+                label="Precio (USD)"
                 type="number"
                 step="1000"
                 {...register('price')}
@@ -199,23 +197,14 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
               />
             </div>
             
-            <div className="mt-4">
-              <TextArea
-                label="Description"
-                {...register('description')}
-                error={errors.description?.message}
-                placeholder="Brief description of the machinery..."
-                rows={3}
-              />
-            </div>
           </div>
 
           {/* Technical Specifications */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Technical Specifications</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Especificaciones Técnicas</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <Input
-                label="Operating Weight (tons) *"
+                label="Peso de Operación (toneladas) *"
                 type="number"
                 step="0.1"
                 {...register('weight')}

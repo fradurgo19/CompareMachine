@@ -85,10 +85,10 @@ export const getJointEvaluationById = async (req: Request, res: Response) => {
       data: evaluation
     };
 
-    res.json(response);
+    return res.json(response);
   } catch (error) {
     console.error('Error getting joint evaluation by ID:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Failed to fetch joint evaluation'
     });
@@ -173,10 +173,10 @@ export const updateJointEvaluation = async (req: Request, res: Response) => {
       message: 'Joint evaluation updated successfully'
     };
 
-    res.json(response);
+    return res.json(response);
   } catch (error) {
     console.error('Error updating joint evaluation:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Failed to update joint evaluation'
     });
@@ -210,10 +210,10 @@ export const deleteJointEvaluation = async (req: Request, res: Response) => {
       message: 'Joint evaluation deleted successfully'
     };
 
-    res.json(response);
+    return res.json(response);
   } catch (error) {
     console.error('Error deleting joint evaluation:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Failed to delete joint evaluation'
     });
@@ -243,10 +243,10 @@ export const calculateJointEvaluationResults = async (req: Request, res: Respons
       data: calculations
     };
 
-    res.json(response);
+    return res.json(response);
   } catch (error) {
     console.error('Error calculating joint evaluation:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Failed to calculate joint evaluation'
     });

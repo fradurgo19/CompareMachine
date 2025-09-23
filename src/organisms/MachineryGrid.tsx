@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
-import { machineryApi } from '../services/machineryApi';
+import api from '../services/api';
 import { useAppContext } from '../context/AppContext';
 import MachineryCard from '../molecules/MachineryCard';
 import FilterPanel from '../molecules/FilterPanel';
@@ -19,20 +19,32 @@ const MachineryGrid: React.FC<MachineryGridProps> = ({ onViewDetails }) => {
 
   const { data: machineryResponse, isLoading, error } = useQuery({
     queryKey: ['machinery', filters, sortBy],
-    queryFn: () => machineryApi.getMachinery(filters, sortBy),
+    queryFn: () => api.getMachinery({
+      category: filters.category !== 'all' ? filters.category : undefined,
+      manufacturer: filters.manufacturer || undefined,
+      availability: filters.availability !== 'all' ? filters.availability : undefined,
+      priceMin: filters.priceRange[0],
+      priceMax: filters.priceRange[1],
+      weightMin: filters.weightRange[0],
+      weightMax: filters.weightRange[1],
+      powerMin: filters.powerRange[0],
+      powerMax: filters.powerRange[1],
+      sortBy: sortBy.field,
+      sortOrder: sortBy.direction,
+    }),
   });
 
   const machinery = machineryResponse?.data || [];
 
   const sortOptions = [
-    { value: 'name:asc', label: 'Name (A-Z)' },
-    { value: 'name:desc', label: 'Name (Z-A)' },
-    { value: 'specifications.weight:asc', label: 'Weight (Low to High)' },
-    { value: 'specifications.weight:desc', label: 'Weight (High to Low)' },
-    { value: 'specifications.power:asc', label: 'Power (Low to High)' },
-    { value: 'specifications.power:desc', label: 'Power (High to Low)' },
-    { value: 'price:asc', label: 'Price (Low to High)' },
-    { value: 'price:desc', label: 'Price (High to Low)' },
+    { value: 'name:asc', label: 'Nombre (A-Z)' },
+    { value: 'name:desc', label: 'Nombre (Z-A)' },
+    { value: 'specifications.weight:asc', label: 'Peso (Bajo a Alto)' },
+    { value: 'specifications.weight:desc', label: 'Peso (Alto a Bajo)' },
+    { value: 'specifications.power:asc', label: 'Potencia (Baja a Alta)' },
+    { value: 'specifications.power:desc', label: 'Potencia (Alta a Baja)' },
+    { value: 'price:asc', label: 'Precio (Bajo a Alto)' },
+    { value: 'price:desc', label: 'Precio (Alto a Bajo)' },
   ];
 
   const handleSortChange = (value: string) => {
@@ -49,7 +61,7 @@ const MachineryGrid: React.FC<MachineryGridProps> = ({ onViewDetails }) => {
   if (error) {
     return (
       <div className="text-center py-12">
-        <p className="text-red-600">Error loading machinery data</p>
+        <p className="text-red-600">Error al cargar datos de maquinaria</p>
       </div>
     );
   }
@@ -64,7 +76,7 @@ const MachineryGrid: React.FC<MachineryGridProps> = ({ onViewDetails }) => {
             onClick={() => setShowFilters(true)}
           >
             <SlidersHorizontal className="w-4 h-4 mr-2" />
-            Filters
+            Filtros
           </Button>
           
           <div className="flex items-center">
@@ -80,7 +92,7 @@ const MachineryGrid: React.FC<MachineryGridProps> = ({ onViewDetails }) => {
 
         {machineryResponse?.meta && (
           <p className="text-sm text-gray-500">
-            {machineryResponse.meta.total} results found
+            {machineryResponse.meta.total} resultados encontrados
           </p>
         )}
       </div>
@@ -96,12 +108,12 @@ const MachineryGrid: React.FC<MachineryGridProps> = ({ onViewDetails }) => {
       {/* Empty State */}
       {!isLoading && machinery.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-gray-500 mb-4">No machinery found matching your criteria</p>
+          <p className="text-gray-500 mb-4">No se encontró maquinaria que coincida con tus criterios</p>
           <Button
             variant="outline"
             onClick={() => setShowFilters(true)}
           >
-            Adjust Filters
+            Ajustar Filtros
           </Button>
         </div>
       )}

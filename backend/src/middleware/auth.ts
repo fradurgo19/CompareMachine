@@ -19,7 +19,7 @@ export const authenticateToken = async (
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as { userId: string };
     
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
@@ -41,7 +41,7 @@ export const authenticateToken = async (
     }
 
     req.user = user as any;
-    next();
+    return next();
   } catch (error) {
     return res.status(401).json({
       success: false,
@@ -61,5 +61,5 @@ export const requireAdmin = (
       message: 'Admin access required'
     });
   }
-  next();
+  return next();
 };

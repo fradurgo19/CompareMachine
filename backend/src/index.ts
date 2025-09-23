@@ -6,7 +6,7 @@ import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import swaggerUi from 'swagger-ui-express';
-import swaggerDocument from './swagger.json';
+// import swaggerDocument from './swagger.json';
 
 // Import routes
 import machineryRoutes from './routes/machinery';
@@ -19,13 +19,19 @@ import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: './config.env' });
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Initialize Prisma Client
-export const prisma = new PrismaClient();
+export const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL || "postgresql://postgres:password@localhost:5432/compare_machine_db"
+    }
+  }
+});
 
 // Rate limiting
 const limiter = rateLimit({
@@ -33,7 +39,7 @@ const limiter = rateLimit({
   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'), // limit each IP to 100 requests per windowMs
   message: {
     success: false,
-    message: 'Too many requests from this IP, please try again later.'
+    message: 'Demasiadas solicitudes desde esta IP, por favor intenta más tarde.'
   }
 });
 
@@ -49,13 +55,13 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Swagger Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
     success: true,
-    message: 'CompareMachine API is running',
+    message: 'API de CompareMachine está funcionando',
     timestamp: new Date().toISOString(),
     version: '1.0.0'
   });

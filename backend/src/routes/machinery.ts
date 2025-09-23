@@ -20,7 +20,10 @@ router.get('/:id', getMachineryById);
 router.use(authenticateToken);
 
 // Admin only routes
-router.post('/', requireAdmin, createMachinery);
+// router.post('/', requireAdmin, createMachinery); // Temporarily allow all authenticated users
+
+// Allow authenticated users to create machinery
+router.post('/', createMachinery);
 router.put('/:id', requireAdmin, updateMachinery);
 router.delete('/:id', requireAdmin, deleteMachinery);
 

@@ -5,7 +5,7 @@ import { prisma } from '../index';
 import { loginSchema, registerSchema } from '../validators/auth';
 import { ApiResponse, AuthResponse } from '../types';
 
-export const register = async (req: Request, res: Response) => {
+export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = registerSchema.parse(req.body);
 
@@ -15,10 +15,11 @@ export const register = async (req: Request, res: Response) => {
     });
 
     if (existingUser) {
-      return res.status(409).json({
+      res.status(409).json({
         success: false,
-        message: 'User with this email already exists'
+        message: 'Ya existe un usuario con este correo electrónico'
       });
+      return;
     }
 
     // Hash password
@@ -41,10 +42,15 @@ export const register = async (req: Request, res: Response) => {
     });
 
     // Generate JWT token
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET is not defined');
+    }
+    
     const token = jwt.sign(
       { userId: user.id },
-      process.env.JWT_SECRET!,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+      jwtSecret,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' } as jwt.SignOptions
     );
 
     const response: ApiResponse<AuthResponse> = {
@@ -53,7 +59,7 @@ export const register = async (req: Request, res: Response) => {
         user,
         token
       },
-      message: 'User registered successfully'
+      message: 'Usuario registrado exitosamente'
     };
 
     res.status(201).json(response);
@@ -61,12 +67,12 @@ export const register = async (req: Request, res: Response) => {
     console.error('Error registering user:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to register user'
+      message: 'Error al registrar usuario'
     });
   }
 };
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = loginSchema.parse(req.body);
 
@@ -76,27 +82,34 @@ export const login = async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
-        message: 'Invalid credentials'
+        message: 'Credenciales inválidas'
       });
+      return;
     }
 
     // Check password
     const isPasswordValid = await bcrypt.compare(data.password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
-        message: 'Invalid credentials'
+        message: 'Credenciales inválidas'
       });
+      return;
     }
 
     // Generate JWT token
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET is not defined');
+    }
+    
     const token = jwt.sign(
       { userId: user.id },
-      process.env.JWT_SECRET!,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+      jwtSecret,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' } as jwt.SignOptions
     );
 
     const { password, ...userWithoutPassword } = user;
@@ -107,7 +120,7 @@ export const login = async (req: Request, res: Response) => {
         user: userWithoutPassword,
         token
       },
-      message: 'Login successful'
+      message: 'Inicio de sesión exitoso'
     };
 
     res.json(response);
@@ -115,12 +128,12 @@ export const login = async (req: Request, res: Response) => {
     console.error('Error logging in user:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to login user'
+      message: 'Error al iniciar sesión'
     });
   }
 };
 
-export const getProfile = async (req: Request, res: Response) => {
+export const getProfile = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = (req as any).user;
 
@@ -134,7 +147,7 @@ export const getProfile = async (req: Request, res: Response) => {
     console.error('Error getting profile:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get profile'
+      message: 'Error al obtener perfil'
     });
   }
 };

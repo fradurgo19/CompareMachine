@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 interface JointCalculationProps {
   standardDiameter: number;
   structureHousingDiameter: number;
@@ -7,13 +5,12 @@ interface JointCalculationProps {
   pinDiameter: number;
 }
 
-export const useJointCalculations = ({
+export const calculateJointResults = ({
   standardDiameter,
   structureHousingDiameter,
   bushingDiameter,
   pinDiameter
 }: JointCalculationProps) => {
-  return useMemo(() => {
     // CRITERION formula: IF(C4>60,1.2,1)
     const criterion = standardDiameter > 60 ? 1.2 : 1;
 
@@ -35,30 +32,30 @@ export const useJointCalculations = ({
     // CRITERIA formulas (three conditional formulas combined)
     const criteria: string[] = [];
 
-    // First condition: IF(G4=1,"MACHINE","",IF(H4=1,IF((D4-C4)>(C4-F4),"MACHINE","CHANGE PIN"),""))
+    // First condition: IF(G4=1,"MAQUINAR","",IF(H4=1,IF((D4-C4)>(C4-F4),"MAQUINAR","CAMBIAR PIN"),""))
     if (aeResult === 1) {
-      criteria.push("MACHINE");
+      criteria.push("MAQUINAR");
     } else if (apResult === 1) {
       if ((structureHousingDiameter - standardDiameter) > (standardDiameter - pinDiameter)) {
-        criteria.push("MACHINE");
+        criteria.push("MAQUINAR");
       } else {
-        criteria.push("CHANGE PIN");
+        criteria.push("CAMBIAR PIN");
       }
     }
 
-    // Second condition: IF(I4=1,"CHANGE PIN","")
+    // Second condition: IF(I4=1,"CAMBIAR PIN","")
     if (epResult === 1) {
-      criteria.push("CHANGE PIN");
+      criteria.push("CAMBIAR PIN");
     }
 
-    // Third condition: IF(J4=1,"CHANGE BUSHINGS",IF(K4=1,IF((E4-C4)>(C4-F4),"CHANGE BUSHINGS","CHANGE PIN"),""))
+    // Third condition: IF(J4=1,"CAMBIAR BOCINAS",IF(K4=1,IF((E4-C4)>(C4-F4),"CAMBIAR BOCINAS","CAMBIAR PIN"),""))
     if (beResult === 1) {
-      criteria.push("CHANGE BUSHINGS");
+      criteria.push("CAMBIAR BOCINAS");
     } else if (bpResult === 1) {
       if ((bushingDiameter - standardDiameter) > (standardDiameter - pinDiameter)) {
-        criteria.push("CHANGE BUSHINGS");
+        criteria.push("CAMBIAR BOCINAS");
       } else {
-        criteria.push("CHANGE PIN");
+        criteria.push("CAMBIAR PIN");
       }
     }
 
@@ -74,5 +71,9 @@ export const useJointCalculations = ({
       bpResult,
       criteria: uniqueCriteria
     };
-  }, [standardDiameter, structureHousingDiameter, bushingDiameter, pinDiameter]);
+};
+
+// Keep the hook for backward compatibility
+export const useJointCalculations = (props: JointCalculationProps) => {
+  return calculateJointResults(props);
 };

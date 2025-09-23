@@ -21,19 +21,23 @@ const MachineryCard: React.FC<MachineryCardProps> = ({
   const handleToggleSelection = () => {
     if (isSelected) {
       setSelectedMachinery(selectedMachinery.filter(id => id !== machinery.id));
-    } else if (selectedMachinery.length < 4) {
+    } else if (selectedMachinery.length < 5) {
       setSelectedMachinery([...selectedMachinery, machinery.id]);
     }
+  };
+
+  const handleQuickCompare = () => {
+    handleToggleSelection();
   };
 
   const getAvailabilityBadge = () => {
     switch (machinery.availability) {
       case 'available':
-        return <Badge variant="success">Available</Badge>;
+        return <Badge variant="success">Disponible</Badge>;
       case 'limited':
-        return <Badge variant="warning">Limited</Badge>;
+        return <Badge variant="warning">Limitado</Badge>;
       case 'unavailable':
-        return <Badge variant="error">Unavailable</Badge>;
+        return <Badge variant="error">No Disponible</Badge>;
       default:
         return null;
     }
@@ -84,11 +88,11 @@ const MachineryCard: React.FC<MachineryCardProps> = ({
 
         <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
           <div>
-            <span className="text-gray-500">Weight:</span>
+            <span className="text-gray-500">Peso:</span>
             <span className="ml-1 font-medium">{machinery.specifications.weight}t</span>
           </div>
           <div>
-            <span className="text-gray-500">Power:</span>
+            <span className="text-gray-500">Potencia:</span>
             <span className="ml-1 font-medium">{machinery.specifications.power}hp</span>
           </div>
         </div>
@@ -101,21 +105,20 @@ const MachineryCard: React.FC<MachineryCardProps> = ({
             className="flex-1"
           >
             <Eye className="w-4 h-4 mr-1" />
-            Details
+            Detalles
           </Button>
           
-          {comparisonMode && (
-            <Button
-              variant={isSelected ? 'primary' : 'outline'}
-              size="sm"
-              onClick={handleToggleSelection}
-              disabled={!isSelected && selectedMachinery.length >= 4}
-              className="flex-1"
-            >
-              <Compare className="w-4 h-4 mr-1" />
-              {isSelected ? 'Selected' : 'Compare'}
-            </Button>
-          )}
+          <Button
+            variant={isSelected ? 'primary' : 'outline'}
+            size="sm"
+            onClick={handleQuickCompare}
+            disabled={!isSelected && selectedMachinery.length >= 5}
+            title={!isSelected && selectedMachinery.length >= 5 ? 'Máximo 5 máquinas para comparar' : ''}
+            className="flex-1"
+          >
+            <Compare className="w-4 h-4 mr-1" />
+            {isSelected ? 'Seleccionada' : 'Comparar'}
+          </Button>
         </div>
       </div>
     </Card>

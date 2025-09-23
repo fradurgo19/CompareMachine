@@ -5,6 +5,7 @@ import { Plus, ArrowLeft } from 'lucide-react';
 import MachineryForm from '../molecules/MachineryForm';
 import Button from '../atoms/Button';
 import { Machinery } from '../types';
+import api from '../services/api';
 
 interface MachineryFormData {
   name: string;
@@ -29,29 +30,21 @@ interface MachineryFormData {
   description?: string;
 }
 
-// Mock API function - in a real app, this would call your backend
-const addMachinery = async (data: MachineryFormData, images: File[]): Promise<Machinery> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // Convert images to URLs (in a real app, you'd upload to a file storage service)
-  const imageUrls = images.map((file, index) => 
-    URL.createObjectURL(file) // This is just for demo - use proper file upload service
-  );
-  
-  // If no images provided, use default placeholder
-  const finalImages = imageUrls.length > 0 ? imageUrls : [
+// Real API function that calls the backend
+const addMachinery = async (data: MachineryFormData, _images: File[]): Promise<Machinery> => {
+  // For now, we'll use default images since file upload isn't implemented yet
+  const defaultImages = [
     'https://images.pexels.com/photos/1078884/pexels-photo-1078884.jpeg'
   ];
 
-  const newMachinery: Machinery = {
-    id: Date.now().toString(),
+  // Prepare the data for the backend
+  const machineryData = {
     name: data.name,
     model: data.model,
     series: data.series,
-    category: data.category as any,
+    category: data.category,
     manufacturer: data.manufacturer,
-    images: finalImages,
+    images: defaultImages,
     specifications: {
       weight: data.weight,
       power: data.power,
@@ -68,11 +61,16 @@ const addMachinery = async (data: MachineryFormData, images: File[]): Promise<Ma
     },
     price: data.price,
     availability: data.availability,
-    rating: 4.0 + Math.random(), // Random rating for demo
-    createdAt: new Date().toISOString(),
   };
 
-  return newMachinery;
+  // Call the real backend API
+  const response = await api.createMachinery(machineryData);
+  
+  if (!response.success) {
+    throw new Error(response.message || 'Error al crear la maquinaria');
+  }
+
+  return response.data;
 };
 
 const AddMachinery: React.FC = () => {
@@ -101,12 +99,12 @@ const AddMachinery: React.FC = () => {
       
       // Navigate back after showing success message
       setTimeout(() => {
-        navigate('/');
+        navigate('/compare');
       }, 2000);
     },
     onError: (error) => {
       console.error('Error adding machinery:', error);
-      alert('Error adding machinery. Please try again.');
+      alert('Error al agregar maquinaria. Por favor, inténtalo de nuevo.');
     },
   });
 
@@ -115,7 +113,7 @@ const AddMachinery: React.FC = () => {
   };
 
   const handleCancel = () => {
-    navigate('/');
+    navigate('/compare');
   };
 
   if (showSuccessMessage) {
@@ -126,13 +124,13 @@ const AddMachinery: React.FC = () => {
             <Plus className="w-8 h-8 text-green-600" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Machinery Added Successfully!
+            ¡Maquinaria Agregada Exitosamente!
           </h2>
           <p className="text-gray-600 mb-4">
-            The new machinery has been added to the comparison database.
+            La nueva maquinaria ha sido agregada a la base de datos de comparación.
           </p>
           <p className="text-sm text-gray-500">
-            Redirecting to main page...
+            Redirigiendo a la página principal...
           </p>
         </div>
       </div>
@@ -146,21 +144,21 @@ const AddMachinery: React.FC = () => {
         <div className="mb-8">
           <Button
             variant="ghost"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/compare')}
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Comparison
+            Volver a Comparación
           </Button>
           
           <div className="flex items-center">
             <Plus className="w-8 h-8 text-blue-600 mr-3" />
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                Add New Machinery
+                Agregar Nueva Maquinaria
               </h1>
               <p className="text-gray-600 mt-1">
-                Enter detailed specifications for machinery comparison
+                Ingresa especificaciones detalladas para comparación de maquinaria
               </p>
             </div>
           </div>

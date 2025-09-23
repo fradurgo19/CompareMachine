@@ -6,39 +6,39 @@ import { ApiResponse } from '../types';
 export const getMachinery = async (req: Request, res: Response) => {
   try {
     const query = machineryQuerySchema.parse(req.query);
-    const { page, limit, filters, sortBy, sortOrder } = query;
+    const { page, limit, category, manufacturer, priceMin, priceMax, weightMin, weightMax, powerMin, powerMax, availability, search, sortBy, sortOrder } = query;
 
     const skip = (page - 1) * limit;
 
     // Build where clause
     const where: any = {};
 
-    if (filters?.category) {
-      where.category = filters.category;
+    if (category) {
+      where.category = category;
     }
 
-    if (filters?.manufacturer) {
+    if (manufacturer) {
       where.manufacturer = {
-        contains: filters.manufacturer,
+        contains: manufacturer,
         mode: 'insensitive'
       };
     }
 
-    if (filters?.availability) {
-      where.availability = filters.availability;
+    if (availability) {
+      where.availability = availability;
     }
 
-    if (filters?.priceMin || filters?.priceMax) {
+    if (priceMin || priceMax) {
       where.price = {};
-      if (filters.priceMin) where.price.gte = filters.priceMin;
-      if (filters.priceMax) where.price.lte = filters.priceMax;
+      if (priceMin) where.price.gte = priceMin;
+      if (priceMax) where.price.lte = priceMax;
     }
 
-    if (filters?.search) {
+    if (search) {
       where.OR = [
-        { name: { contains: filters.search, mode: 'insensitive' } },
-        { model: { contains: filters.search, mode: 'insensitive' } },
-        { manufacturer: { contains: filters.search, mode: 'insensitive' } }
+        { name: { contains: search, mode: 'insensitive' } },
+        { model: { contains: search, mode: 'insensitive' } },
+        { manufacturer: { contains: search, mode: 'insensitive' } }
       ];
     }
 
@@ -69,14 +69,14 @@ export const getMachinery = async (req: Request, res: Response) => {
 
     // Apply weight and power filters if specified
     let filteredMachinery = machinery;
-    if (filters?.weightMin || filters?.weightMax || filters?.powerMin || filters?.powerMax) {
-      filteredMachinery = machinery.filter(m => {
+    if (weightMin || weightMax || powerMin || powerMax) {
+      filteredMachinery = machinery.filter((m: any) => {
         if (!m.specifications) return false;
         
-        if (filters.weightMin && m.specifications.weight < filters.weightMin) return false;
-        if (filters.weightMax && m.specifications.weight > filters.weightMax) return false;
-        if (filters.powerMin && m.specifications.power < filters.powerMin) return false;
-        if (filters.powerMax && m.specifications.power > filters.powerMax) return false;
+        if (weightMin && m.specifications.weight < weightMin) return false;
+        if (weightMax && m.specifications.weight > weightMax) return false;
+        if (powerMin && m.specifications.power < powerMin) return false;
+        if (powerMax && m.specifications.power > powerMax) return false;
         
         return true;
       });
@@ -128,10 +128,10 @@ export const getMachineryById = async (req: Request, res: Response) => {
       data: machinery
     };
 
-    res.json(response);
+    return res.json(response);
   } catch (error) {
     console.error('Error getting machinery by ID:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Failed to fetch machinery'
     });
@@ -175,15 +175,17 @@ export const updateMachinery = async (req: Request, res: Response) => {
     const { id } = req.params;
     const data = updateMachinerySchema.parse(req.body);
 
+    const { specifications, ...machineryData } = data;
+    
     const machinery = await prisma.machinery.update({
       where: { id },
       data: {
-        ...data,
-        ...(data.specifications && {
+        ...machineryData,
+        ...(specifications && {
           specifications: {
             upsert: {
-              create: data.specifications,
-              update: data.specifications
+              create: specifications,
+              update: specifications
             }
           }
         })
@@ -245,7 +247,7 @@ export const getManufacturers = async (req: Request, res: Response) => {
       }
     });
 
-    const manufacturerNames = manufacturers.map(m => m.manufacturer);
+    const manufacturerNames = manufacturers.map((m: any) => m.manufacturer);
 
     const response: ApiResponse<string[]> = {
       success: true,
