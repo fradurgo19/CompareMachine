@@ -7,7 +7,9 @@ interface EnvironmentConfig {
 }
 
 const config: EnvironmentConfig = {
-  apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:3001/api',
+  apiUrl: import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'production' 
+    ? 'https://compare-machine-backend.vercel.app/api' 
+    : 'http://localhost:3001/api'),
   environment: import.meta.env.MODE || 'development',
   isDevelopment: import.meta.env.MODE === 'development',
   isProduction: import.meta.env.MODE === 'production'

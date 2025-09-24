@@ -57,7 +57,9 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
   ? [
       'https://compare-machine-frontend.vercel.app',
       'https://compare-machine.vercel.app',
-      'https://tu-dominio-personalizado.com'
+      'https://compare-machine-frontend-git-main-frankduran.vercel.app',
+      'https://compare-machine-backend.vercel.app',
+      'https://compare-machine-backend-git-main-frankduran.vercel.app'
     ]
   : ['http://localhost:5173'];
 

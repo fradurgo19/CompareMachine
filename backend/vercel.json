@@ -8,9 +8,20 @@
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "src/index.ts"
+    },
+    {
+      "src": "/health",
+      "dest": "src/index.ts"
+    },
+    {
       "src": "/(.*)",
       "dest": "src/index.ts"
     }
   ],
+  "env": {
+    "NODE_ENV": "production"
+  },
   "buildCommand": "npm run vercel-build"
 }
