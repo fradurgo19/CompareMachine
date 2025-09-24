@@ -15,7 +15,7 @@ const getApiUrl = (): string => {
   
   // Prioridad 2: URL por defecto según el modo
   if (import.meta.env.MODE === 'production') {
-    return 'https://backend-jbj8kgo4j-partequipos-projects.vercel.app';
+    return 'https://backend-3749ma7e3-partequipos-projects.vercel.app';
   }
   
   // Prioridad 3: Desarrollo local
