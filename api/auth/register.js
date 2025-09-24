@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     }
 
     // URL del backend (actualizar cuando cambie)
-    const backendUrl = 'https://backend-3749ma7e3-partequipos-projects.vercel.app';
+    const backendUrl = 'https://backend-o7zr8vzuv-partequipos-projects.vercel.app';
     
     // Hacer request al backend
     const response = await fetch(`${backendUrl}/api/auth/register`, {
