@@ -35,12 +35,6 @@
       "dest": "dist/index.html"
     }
   ],
-  "rewrites": [
-    {
-      "source": "/((?!api/|health|assets/).*)",
-      "destination": "/index.html"
-    }
-  ],
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "env": {
