@@ -23,22 +23,8 @@
       "dest": "backend-unified/src/index.ts"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "dist/assets/$1"
-    },
-    {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
-      "dest": "dist/$1"
-    },
-    {
       "src": "/(.*)",
       "dest": "dist/index.html"
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/((?!api/).*)",
-      "destination": "/index.html"
     }
   ],
   "buildCommand": "npm run build",
