@@ -31,6 +31,16 @@ const MachineryComparison: React.FC = () => {
     console.log('Downloading comparison report...');
   };
 
+  const handleClearSelection = () => {
+    // Limpiar la selección usando el contexto
+    if (window.confirm('¿Estás seguro de que quieres limpiar la selección?')) {
+      // Resetear el estado de comparación
+      toggleComparisonMode();
+      // Recargar la página de manera segura
+      window.location.href = '/compare';
+    }
+  };
+
   // Obtener datos de las máquinas seleccionadas
   const { data: machineryData } = useQuery({
     queryKey: ['machinery'],
@@ -86,7 +96,7 @@ const MachineryComparison: React.FC = () => {
               <div className="flex gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => window.location.reload()}
+                  onClick={handleClearSelection}
                 >
                   Limpiar Selección
                 </Button>
