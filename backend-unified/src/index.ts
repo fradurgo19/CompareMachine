@@ -16,6 +16,7 @@ import userRoutes from './routes/user';
 import initRoutes from './routes/init';
 import debugRoutes from './routes/debug';
 import createAdminRoutes from './routes/create-admin';
+import updateAdminPasswordRoutes from './routes/update-admin-password';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -101,6 +102,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/init', initRoutes);
 app.use('/api/debug', debugRoutes);
 app.use('/api/create-admin', createAdminRoutes);
+app.use('/api/update-admin', updateAdminPasswordRoutes);
 
 // Error handling middleware
 app.use(notFound);
