@@ -70,25 +70,7 @@ if (process.env.CORS_ORIGIN) {
 }
 
 app.use(cors({
-  origin: (origin, callback) => {
-    // Permitir requests sin origin (como mobile apps o curl)
-    if (!origin) return callback(null, true);
-    
-    // En producción, permitir cualquier origen de Vercel
-    if (process.env.NODE_ENV === 'production') {
-      if (origin.includes('vercel.app') || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-    }
-    
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      console.log('🚫 CORS bloqueado para origen:', origin);
-      console.log('✅ Orígenes permitidos:', allowedOrigins);
-      return callback(new Error('No permitido por CORS'), false);
-    }
-  },
+  origin: true, // Permitir todos los orígenes temporalmente
   credentials: true
 }));
 app.use(morgan('combined'));
