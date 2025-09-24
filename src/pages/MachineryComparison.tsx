@@ -15,7 +15,7 @@ import api from '../services/api';
 
 const MachineryComparison: React.FC = () => {
   const [selectedMachinery, setSelectedMachinery] = useState<Machinery | null>(null);
-  const { comparisonMode, selectedMachinery: selectedIds, toggleComparisonMode } = useAppContext();
+  const { comparisonMode, selectedMachinery: selectedIds, toggleComparisonMode, clearSelection } = useAppContext();
   const { isAuthenticated } = useAuth();
 
   const handleViewDetails = (machinery: Machinery) => {
@@ -34,10 +34,8 @@ const MachineryComparison: React.FC = () => {
   const handleClearSelection = () => {
     // Limpiar la selección usando el contexto
     if (window.confirm('¿Estás seguro de que quieres limpiar la selección?')) {
-      // Resetear el estado de comparación
-      toggleComparisonMode();
-      // Recargar la página de manera segura
-      window.location.href = '/compare';
+      // Limpiar la selección y desactivar modo comparación
+      clearSelection();
     }
   };
 

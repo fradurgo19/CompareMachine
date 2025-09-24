@@ -84,6 +84,7 @@ export interface AppContextType {
   sortBy: SortOptions;
   setSelectedMachinery: (ids: string[]) => void;
   toggleComparisonMode: () => void;
+  clearSelection: () => void;
   updateFilters: (filters: Partial<FilterOptions>) => void;
   updateSort: (sort: SortOptions) => void;
 }

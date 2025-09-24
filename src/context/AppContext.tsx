@@ -11,6 +11,7 @@ interface AppState {
 type AppAction =
   | { type: 'SET_SELECTED_MACHINERY'; payload: string[] }
   | { type: 'TOGGLE_COMPARISON_MODE' }
+  | { type: 'CLEAR_SELECTION' }
   | { type: 'UPDATE_FILTERS'; payload: Partial<FilterOptions> }
   | { type: 'UPDATE_SORT'; payload: SortOptions };
 
@@ -45,6 +46,12 @@ function appReducer(state: AppState, action: AppAction): AppState {
         ...state,
         comparisonMode: !state.comparisonMode,
         // NO limpiar las máquinas seleccionadas al activar/desactivar modo comparación
+      };
+    case 'CLEAR_SELECTION':
+      return {
+        ...state,
+        selectedMachinery: [],
+        comparisonMode: false,
       };
     case 'UPDATE_FILTERS':
       return {
@@ -82,6 +89,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     toggleComparisonMode: () => {
       console.log('toggleComparisonMode called, current mode:', state.comparisonMode);
       dispatch({ type: 'TOGGLE_COMPARISON_MODE' });
+    },
+    clearSelection: () => {
+      console.log('clearSelection called');
+      dispatch({ type: 'CLEAR_SELECTION' });
     },
     updateFilters: (filters: Partial<FilterOptions>) =>
       dispatch({ type: 'UPDATE_FILTERS', payload: filters }),
