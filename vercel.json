@@ -24,7 +24,7 @@
     }
   ],
   "env": {
-    "VITE_API_URL": "https://backend-5sh9udq3l-partequipos-projects.vercel.app"
+    "VITE_API_URL": "https://backend-jbj8kgo4j-partequipos-projects.vercel.app"
   },
   "buildCommand": "npm run build",
   "outputDirectory": "dist"
