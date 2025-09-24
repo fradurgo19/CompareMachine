@@ -1,6 +1,6 @@
 {
   "name": "compare-machine-unified",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "description": "CompareMachine - Frontend y Backend unificados",
   "scripts": {
