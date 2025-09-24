@@ -35,6 +35,7 @@
       "dest": "frontend/dist/index.html"
     }
   ],
+  "outputDirectory": "frontend/dist",
   "env": {
     "NODE_ENV": "production"
   }
