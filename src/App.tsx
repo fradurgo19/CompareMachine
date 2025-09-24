@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppProvider } from './context/AppContext';
 import { AuthProvider } from './context/AuthContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import Navigation from './organisms/Navigation';
 import Landing from './pages/Landing';
 import MachineryComparison from './pages/MachineryComparison';
@@ -24,48 +25,50 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AppProvider>
-          <Router>
-            <div className="min-h-screen bg-gray-50">
-              <Navigation />
-              <main>
-                <Routes>
-                  <Route path="/" element={<Landing />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route 
-                    path="/compare" 
-                    element={
-                      <AuthGuard>
-                        <MachineryComparison />
-                      </AuthGuard>
-                    } 
-                  />
-                  <Route 
-                    path="/criteria-evaluation" 
-                    element={
-                      <AuthGuard>
-                        <CriteriaEvaluation />
-                      </AuthGuard>
-                    } 
-                  />
-                  <Route 
-                    path="/add-machinery" 
-                    element={
-                      <AuthGuard>
-                        <AddMachinery />
-                      </AuthGuard>
-                    } 
-                  />
-                </Routes>
-              </main>
-            </div>
-          </Router>
-        </AppProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <AppProvider>
+            <Router>
+              <div className="min-h-screen bg-gray-50">
+                <Navigation />
+                <main>
+                  <Routes>
+                    <Route path="/" element={<Landing />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route 
+                      path="/compare" 
+                      element={
+                        <AuthGuard>
+                          <MachineryComparison />
+                        </AuthGuard>
+                      } 
+                    />
+                    <Route 
+                      path="/criteria-evaluation" 
+                      element={
+                        <AuthGuard>
+                          <CriteriaEvaluation />
+                        </AuthGuard>
+                      } 
+                    />
+                    <Route 
+                      path="/add-machinery" 
+                      element={
+                        <AuthGuard>
+                          <AddMachinery />
+                        </AuthGuard>
+                      } 
+                    />
+                  </Routes>
+                </main>
+              </div>
+            </Router>
+          </AppProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
