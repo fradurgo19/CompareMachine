@@ -31,38 +31,38 @@ function App() {
           <AppProvider>
             <Router>
               <div className="min-h-screen bg-gray-50">
-                <Navigation />
-                <main>
-                  <Routes>
-                    <Route path="/" element={<Landing />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route 
-                      path="/compare" 
-                      element={
-                        <AuthGuard>
-                          <MachineryComparison />
-                        </AuthGuard>
-                      } 
-                    />
-                    <Route 
-                      path="/criteria-evaluation" 
-                      element={
-                        <AuthGuard>
-                          <CriteriaEvaluation />
-                        </AuthGuard>
-                      } 
-                    />
-                    <Route 
-                      path="/add-machinery" 
-                      element={
-                        <AuthGuard>
-                          <AddMachinery />
-                        </AuthGuard>
-                      } 
-                    />
-                  </Routes>
-                </main>
+                <Routes>
+                  <Route path="/" element={<Landing />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route 
+                    path="/compare" 
+                    element={
+                      <AuthGuard>
+                        <Navigation />
+                        <MachineryComparison />
+                      </AuthGuard>
+                    } 
+                  />
+                  <Route 
+                    path="/criteria-evaluation" 
+                    element={
+                      <AuthGuard>
+                        <Navigation />
+                        <CriteriaEvaluation />
+                      </AuthGuard>
+                    } 
+                  />
+                  <Route 
+                    path="/add-machinery" 
+                    element={
+                      <AuthGuard>
+                        <Navigation />
+                        <AddMachinery />
+                      </AuthGuard>
+                    } 
+                  />
+                </Routes>
               </div>
             </Router>
           </AppProvider>
