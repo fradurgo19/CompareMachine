@@ -35,6 +35,7 @@
       "dest": "dist/index.html"
     }
   ],
+  "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "env": {
     "NODE_ENV": "production"

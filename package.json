@@ -6,12 +6,21 @@
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend-unified && npm run dev",
-    "build": "npm run build:frontend && npm run build:backend",
+    "build": "vite build",
     "build:frontend": "cd frontend && npm run build",
     "build:backend": "cd backend-unified && npm run build",
     "install:all": "npm install && cd frontend && npm install && cd ../backend-unified && npm install"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "vite": "^5.4.8",
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "^5.9.2",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.15",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "terser": "^5.36.0"
   }
 }
