@@ -15,6 +15,7 @@ import authRoutes from './routes/auth';
 import userRoutes from './routes/user';
 import initRoutes from './routes/init';
 import debugRoutes from './routes/debug';
+import createAdminRoutes from './routes/create-admin';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -99,6 +100,7 @@ app.use('/api/joint-evaluations', jointEvaluationRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/init', initRoutes);
 app.use('/api/debug', debugRoutes);
+app.use('/api/create-admin', createAdminRoutes);
 
 // Error handling middleware
 app.use(notFound);
