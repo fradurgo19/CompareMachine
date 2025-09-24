@@ -1,9 +1,26 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { copyFileSync } from 'fs';
+import { resolve } from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: 'copy-redirects',
+      writeBundle() {
+        try {
+          copyFileSync(
+            resolve(__dirname, 'public/_redirects'),
+            resolve(__dirname, 'dist/_redirects')
+          );
+        } catch (error) {
+          console.warn('Could not copy _redirects file:', error);
+        }
+      }
+    }
+  ],
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
