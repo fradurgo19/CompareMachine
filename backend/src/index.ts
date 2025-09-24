@@ -63,6 +63,11 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
     ]
   : ['http://localhost:5173'];
 
+// Agregar CORS_ORIGIN si está definido
+if (process.env.CORS_ORIGIN) {
+  allowedOrigins.push(process.env.CORS_ORIGIN);
+}
+
 app.use(cors({
   origin: (origin, callback) => {
     // Permitir requests sin origin (como mobile apps o curl)
