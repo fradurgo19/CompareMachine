@@ -160,7 +160,7 @@ export const parseExcelSpecifications = async (req: Request, res: Response) => {
 /**
  * Generate Excel template for download
  */
-export const generateExcelTemplate = async (req: Request, res: Response) => {
+export const generateExcelTemplate = (req: Request, res: Response) => {
   try {
     // Create workbook
     const workbook = XLSX.utils.book_new();
@@ -204,61 +204,37 @@ export const generateExcelTemplate = async (req: Request, res: Response) => {
     // Create worksheet
     const worksheet = XLSX.utils.json_to_sheet(templateData);
     
-    // Set column widths
-    const columnWidths = [
-      { wch: 15 }, // Model
-      { wch: 15 }, // Manufacturer
-      { wch: 12 }, // Series
-      { wch: 12 }, // Category
-      { wch: 30 }, // Region Offerings
-      { wch: 20 }, // Canopy Version Weight
-      { wch: 20 }, // Cab Version Weight
-      { wch: 18 }, // Bucket Capacity
-      { wch: 20 }, // Emission Standard EU
-      { wch: 20 }, // Emission Standard EPA
-      { wch: 20 }, // Engine Model
-      { wch: 22 }, // Rated Power ISO9249
-      { wch: 22 }, // Rated Power SAE J1349
-      { wch: 22 }, // Rated Power EEC 80/1269
-      { wch: 18 }, // Number of Cylinders
-      { wch: 18 }, // Bore x Stroke
-      { wch: 20 }, // Piston Displacement
-      { wch: 20 }, // Implement Circuit
-      { wch: 18 }, // Swing Circuit
-      { wch: 18 }, // Travel Circuit
-      { wch: 25 }, // Max Travel Speed High
-      { wch: 25 }, // Max Travel Speed Low
-      { wch: 18 }, // Swing Speed
-      { wch: 25 }, // Standard Track Shoe Width
-      { wch: 22 }, // Undercarriage Length
-      { wch: 22 }, // Undercarriage Width
-      { wch: 15 }, // Fuel Tank
-      { wch: 20 }, // Hydraulic System
-      { wch: 12 }, // Price
-      { wch: 12 }  // Availability
+    // Set column widths for better readability
+    worksheet['!cols'] = [
+      { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 12 }, { wch: 30 },
+      { wch: 20 }, { wch: 20 }, { wch: 18 }, { wch: 20 }, { wch: 20 },
+      { wch: 20 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 18 },
+      { wch: 18 }, { wch: 20 }, { wch: 20 }, { wch: 18 }, { wch: 18 },
+      { wch: 25 }, { wch: 25 }, { wch: 18 }, { wch: 25 }, { wch: 22 },
+      { wch: 22 }, { wch: 15 }, { wch: 20 }, { wch: 12 }, { wch: 12 }
     ];
-    worksheet['!cols'] = columnWidths;
     
     // Add worksheet to workbook
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Machinery Template');
     
-    // Generate buffer with proper options
-    const excelBuffer = XLSX.write(workbook, { 
+    // Write workbook to buffer
+    const buffer = XLSX.write(workbook, { 
       type: 'buffer', 
-      bookType: 'xlsx',
-      compression: true
+      bookType: 'xlsx'
     });
     
-    // Set headers for download
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename="machinery-template.xlsx"');
-    res.setHeader('Content-Length', excelBuffer.length.toString());
-    
-    return res.end(excelBuffer, 'binary');
+    // Send file as download
+    res.status(200)
+      .set({
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition': 'attachment; filename=machinery-template.xlsx',
+        'Content-Length': buffer.length
+      })
+      .send(buffer);
   } catch (error: any) {
     console.error('Error generating Excel template:', error);
     
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message: 'Error al generar el template de Excel',
       error: error.message,
