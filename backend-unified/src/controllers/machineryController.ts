@@ -67,11 +67,25 @@ export const getMachinery = async (req: Request, res: Response) => {
       prisma.machinery.count({ where })
     ]);
 
+    console.log('🔍 Backend Debug - Before filtering:', {
+      totalFromDB: total,
+      machineryCount: machinery.length,
+      filters: { weightMin, weightMax, powerMin, powerMax },
+      firstMachinery: machinery[0] ? {
+        name: machinery[0].name,
+        model: machinery[0].model,
+        specs: machinery[0].specifications
+      } : null
+    });
+
     // Apply weight and power filters if specified
     let filteredMachinery = machinery;
     if (weightMin || weightMax || powerMin || powerMax) {
       filteredMachinery = machinery.filter((m: any) => {
-        if (!m.specifications) return false;
+        if (!m.specifications) {
+          console.log(`❌ ${m.name} - No specifications`);
+          return false;
+        }
         
         // Get weight from new fields (canopyVersionWeight/cabVersionWeight) or old field (weight)
         const weight = m.specifications.cabVersionWeight || 
@@ -84,14 +98,34 @@ export const getMachinery = async (req: Request, res: Response) => {
                      m.specifications.power || 
                      0;
         
-        if (weightMin && weight < weightMin) return false;
-        if (weightMax && weight > weightMax) return false;
-        if (powerMin && power < powerMin) return false;
-        if (powerMax && power > powerMax) return false;
+        console.log(`🔍 Checking ${m.name}:`, { weight, power, weightMin, weightMax, powerMin, powerMax });
         
+        if (weightMin && weight < weightMin) {
+          console.log(`❌ ${m.name} - Weight ${weight} < ${weightMin}`);
+          return false;
+        }
+        if (weightMax && weight > weightMax) {
+          console.log(`❌ ${m.name} - Weight ${weight} > ${weightMax}`);
+          return false;
+        }
+        if (powerMin && power < powerMin) {
+          console.log(`❌ ${m.name} - Power ${power} < ${powerMin}`);
+          return false;
+        }
+        if (powerMax && power > powerMax) {
+          console.log(`❌ ${m.name} - Power ${power} > ${powerMax}`);
+          return false;
+        }
+        
+        console.log(`✅ ${m.name} - PASSED filters`);
         return true;
       });
     }
+
+    console.log('🔍 Backend Debug - After filtering:', {
+      filteredCount: filteredMachinery.length,
+      names: filteredMachinery.map(m => m.name)
+    });
 
     const totalPages = Math.ceil(total / limit);
 
