@@ -329,9 +329,8 @@ class ApiService {
   }
 
   async downloadExcelTemplate(): Promise<void> {
-    // baseURL already includes /api, so we need to construct the full path differently
-    const baseUrl = this.baseURL.replace('/api', ''); // Remove /api if present
-    const url = `${baseUrl}/api/excel-parser/template`;
+    // baseURL already includes /api (e.g., https://backend.../api)
+    const url = `${this.baseURL}/excel-parser/template`;
     window.open(url, '_blank');
   }
 }
