@@ -67,10 +67,10 @@ model MachinerySpecifications {
   emissionStandardEPA String?
 
   // Engine Model
-  engineModel String
+  engineModel String @default("Unknown")
 
   // Rated Power
-  ratedPowerISO9249    Float // kW
+  ratedPowerISO9249    Float @default(0) // kW
   ratedPowerSAEJ1349   Float? // kW
   ratedPowerEEC80_1269 Float? // kW
   numberOfCylinders    Int?
@@ -91,7 +91,7 @@ model MachinerySpecifications {
   undercarriageWidthRetract Float? // mm
 
   // Capacity (Refilled)
-  fuelTankCapacity        Float // L
+  fuelTankCapacity        Float @default(0) // L
   hydraulicSystemCapacity Float? // L
 
   // Backward compatibility fields (deprecated but kept for migration)
