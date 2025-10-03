@@ -43,10 +43,10 @@ export const getMachinery = async (req: Request, res: Response) => {
 
     const skip = (page - 1) * limit;
 
-    // Build where clause
+    // Build where clause - SIMPLIFIED
     const where: any = {};
 
-    // Only filter by category if it's not 'all'
+    // Only filter by category if it's explicitly set (not 'all')
     if (category && category !== 'all') {
       where.category = category;
     }
@@ -59,15 +59,17 @@ export const getMachinery = async (req: Request, res: Response) => {
       };
     }
 
-    // Only filter by availability if it's provided
+    // Only filter by availability if it's explicitly set
     if (availability) {
       where.availability = availability;
     }
 
-    if (priceMin || priceMax) {
-      where.price = {};
-      if (priceMin) where.price.gte = priceMin;
-      if (priceMax) where.price.lte = priceMax;
+    // Only apply price filter if values are realistic
+    if (priceMin && priceMin > 0) {
+      where.price = { ...where.price, gte: priceMin };
+    }
+    if (priceMax && priceMax < 10000000) {
+      where.price = { ...where.price, lte: priceMax };
     }
 
     if (search) {
@@ -78,12 +80,9 @@ export const getMachinery = async (req: Request, res: Response) => {
       ];
     }
 
-    console.log('🔍 WHERE CLAUSE:', JSON.stringify(where, null, 2));
-    console.log('🔍 PAGINATION:', { skip, limit, page });
-
     // Build orderBy clause
     let orderBy: any = { createdAt: 'desc' };
-    if (sortBy) {
+    if (sortBy && sortBy !== 'name') { // Default sort is name, skip if it's that
       if (sortBy.includes('.')) {
         const [relation, field] = sortBy.split('.');
         orderBy = { [relation]: { [field]: sortOrder } };
@@ -92,106 +91,65 @@ export const getMachinery = async (req: Request, res: Response) => {
       }
     }
 
-    // Get machinery with specifications
-    const [machinery, total] = await Promise.all([
+    // Get ALL machinery from DB with specifications
+    const [allMachinery, total] = await Promise.all([
       prisma.machinery.findMany({
         where,
         include: {
           specifications: true
         },
-        orderBy,
-        skip,
-        take: limit
+        orderBy
       }),
       prisma.machinery.count({ where })
     ]);
 
-    console.log('🔍 PRISMA RESULTS:', { totalCount: total, machineryFetched: machinery.length, allNames: machinery.map(m => m.name) });
-
-    console.log('🔍 Backend Debug - Before filtering:', {
-      totalFromDB: total,
-      machineryCount: machinery.length,
-      filters: { weightMin, weightMax, powerMin, powerMax },
-      firstMachinery: machinery[0] ? {
-        name: machinery[0].name,
-        model: machinery[0].model,
-        specs: machinery[0].specifications
-      } : null
-    });
-
-    // Apply weight and power filters ONLY if they are meaningful (not default extreme values)
-    let filteredMachinery = machinery;
+    // Apply client-side weight and power filters (only if user changed them)
+    let filteredMachinery = allMachinery;
     const hasWeightFilter = (weightMin && weightMin > 0) || (weightMax && weightMax < 1000000);
     const hasPowerFilter = (powerMin && powerMin > 0) || (powerMax && powerMax < 1000000);
     
     if (hasWeightFilter || hasPowerFilter) {
-      console.log('🔍 Applying weight/power filters:', { weightMin, weightMax, powerMin, powerMax, hasWeightFilter, hasPowerFilter });
-      
-      filteredMachinery = machinery.filter((m: any) => {
-        if (!m.specifications) {
-          console.log(`❌ ${m.name} - No specifications`);
-          return false;
-        }
+      filteredMachinery = allMachinery.filter((m: any) => {
+        if (!m.specifications) return true; // Include if no specs
         
-        // Get weight from new fields (canopyVersionWeight/cabVersionWeight) or old field (weight)
+        // Get weight (try new fields first, then old)
         const weight = m.specifications.cabVersionWeight || 
                       m.specifications.canopyVersionWeight || 
                       m.specifications.weight || 
                       0;
         
-        // Get power from new field (ratedPowerISO9249) or old field (power)
+        // Get power (try new fields first, then old)
         const power = m.specifications.ratedPowerISO9249 || 
                      m.specifications.power || 
                      0;
         
-        console.log(`🔍 Checking ${m.name}:`, { weight, power, weightMin, weightMax, powerMin, powerMax });
-        
-        // Only apply weight filters if they are meaningful
+        // Apply weight filter only if meaningful
         if (hasWeightFilter) {
-          if (weightMin && weightMin > 0 && weight < weightMin) {
-            console.log(`❌ ${m.name} - Weight ${weight} < ${weightMin}`);
-            return false;
-          }
-          if (weightMax && weightMax < 1000000 && weight > weightMax) {
-            console.log(`❌ ${m.name} - Weight ${weight} > ${weightMax}`);
-            return false;
-          }
+          if (weightMin && weightMin > 0 && weight > 0 && weight < weightMin) return false;
+          if (weightMax && weightMax < 1000000 && weight > weightMax) return false;
         }
         
-        // Only apply power filters if they are meaningful
+        // Apply power filter only if meaningful
         if (hasPowerFilter) {
-          if (powerMin && powerMin > 0 && power < powerMin) {
-            console.log(`❌ ${m.name} - Power ${power} < ${powerMin}`);
-            return false;
-          }
-          if (powerMax && powerMax < 1000000 && power > powerMax) {
-            console.log(`❌ ${m.name} - Power ${power} > ${powerMax}`);
-            return false;
-          }
+          if (powerMin && powerMin > 0 && power > 0 && power < powerMin) return false;
+          if (powerMax && powerMax < 1000000 && power > powerMax) return false;
         }
         
-        console.log(`✅ ${m.name} - PASSED filters`);
         return true;
       });
-    } else {
-      console.log('✅ No weight/power filters applied - showing all machinery');
     }
 
-    console.log('🔍 Backend Debug - After filtering:', {
-      filteredCount: filteredMachinery.length,
-      names: filteredMachinery.map(m => m.name)
-    });
+    // Apply pagination AFTER filtering
+    const paginatedMachinery = filteredMachinery.slice(skip, skip + limit);
 
-    const totalPages = Math.ceil(total / limit);
-
-    const response: ApiResponse<typeof filteredMachinery> = {
+    const response: ApiResponse<typeof paginatedMachinery> = {
       success: true,
-      data: filteredMachinery,
+      data: paginatedMachinery,
       meta: {
-        total,
+        total: filteredMachinery.length,
         page,
         limit,
-        totalPages
+        totalPages: Math.ceil(filteredMachinery.length / limit)
       }
     };
 

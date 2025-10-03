@@ -17,13 +17,21 @@ const MachineryGrid: React.FC<MachineryGridProps> = ({ onViewDetails }) => {
   const { filters, sortBy, updateSort } = useAppContext();
   const [showFilters, setShowFilters] = useState(false);
 
-  // TEMPORARY: Use diagnostic endpoint to bypass filter issues
   const { data: machineryResponse, isLoading, error } = useQuery({
-    queryKey: ['machinery-diagnostic'],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/machinery/diagnostic/all`);
-      return response.json();
-    },
+    queryKey: ['machinery', filters, sortBy],
+    queryFn: () => api.getMachinery({
+      category: filters.category !== 'all' ? filters.category : undefined,
+      manufacturer: filters.manufacturer || undefined,
+      availability: filters.availability !== 'all' ? filters.availability : undefined,
+      priceMin: filters.priceRange[0],
+      priceMax: filters.priceRange[1],
+      weightMin: filters.weightRange[0],
+      weightMax: filters.weightRange[1],
+      powerMin: filters.powerRange[0],
+      powerMax: filters.powerRange[1],
+      sortBy: sortBy.field,
+      sortOrder: sortBy.direction,
+    }),
     staleTime: 0,
     refetchOnMount: 'always',
     refetchOnWindowFocus: true,
