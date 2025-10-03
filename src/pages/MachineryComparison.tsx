@@ -136,6 +136,9 @@ const MachineryComparison: React.FC = () => {
   const { data: machineryData } = useQuery({
     queryKey: ['machinery'],
     queryFn: () => api.getMachinery({}),
+    staleTime: 0, // Always consider data stale to force refetch
+    refetchOnMount: 'always', // Always refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window regains focus
   });
 
   const selectedMachineryData = useMemo(() => {

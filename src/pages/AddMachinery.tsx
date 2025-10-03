@@ -121,19 +121,13 @@ const AddMachinery: React.FC = () => {
   const addMachineryMutation = useMutation({
     mutationFn: ({ data, images }: { data: MachineryFormData; images: File[] }) =>
       addMachinery(data, images),
-    onSuccess: (newMachinery) => {
-      // Update the cache with the new machinery
-      queryClient.setQueryData(['machinery'], (oldData: any) => {
-        if (!oldData) return { data: [newMachinery], success: true };
-        return {
-          ...oldData,
-          data: [newMachinery, ...oldData.data],
-        };
-      });
+    onSuccess: async (newMachinery) => {
+      // Invalidate queries and force immediate refetch
+      await queryClient.invalidateQueries({ queryKey: ['machinery'], refetchType: 'all' });
+      await queryClient.invalidateQueries({ queryKey: ['manufacturers'], refetchType: 'all' });
       
-      // Invalidate queries to refetch fresh data
-      queryClient.invalidateQueries({ queryKey: ['machinery'] });
-      queryClient.invalidateQueries({ queryKey: ['manufacturers'] });
+      // Force refetch immediately
+      await queryClient.refetchQueries({ queryKey: ['machinery'] });
       
       setShowSuccessMessage(true);
       
@@ -184,9 +178,12 @@ const AddMachinery: React.FC = () => {
         await api.createMachinery(machineryData);
       }
 
-      // Invalidate queries to refetch fresh data
-      queryClient.invalidateQueries({ queryKey: ['machinery'] });
-      queryClient.invalidateQueries({ queryKey: ['manufacturers'] });
+      // Invalidate queries and force immediate refetch
+      await queryClient.invalidateQueries({ queryKey: ['machinery'], refetchType: 'all' });
+      await queryClient.invalidateQueries({ queryKey: ['manufacturers'], refetchType: 'all' });
+      
+      // Force refetch immediately
+      await queryClient.refetchQueries({ queryKey: ['machinery'] });
 
       setShowSuccessMessage(true);
 
