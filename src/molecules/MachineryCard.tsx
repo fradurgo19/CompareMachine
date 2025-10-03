@@ -47,7 +47,7 @@ const MachineryCard: React.FC<MachineryCardProps> = ({
         comparisonMode && isSelected ? 'ring-2 ring-blue-500 shadow-lg' : ''
       }`}
     >
-      <div className="space-y-4">
+      <div className="p-6 space-y-4">
         {/* Header */}
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -65,7 +65,7 @@ const MachineryCard: React.FC<MachineryCardProps> = ({
         </div>
 
         {/* Key Specifications */}
-        <div className="space-y-2 text-sm">
+        <div className="space-y-3 text-sm pt-2 border-t border-gray-100">
           {/* 2. Region Offerings */}
           <div className="flex justify-between">
             <span className="text-gray-500">2. Region:</span>
@@ -102,7 +102,7 @@ const MachineryCard: React.FC<MachineryCardProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 pt-2">
           <Button
             variant="outline"
             size="sm"
