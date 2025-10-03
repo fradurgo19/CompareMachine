@@ -32,9 +32,20 @@ const MachineryGrid: React.FC<MachineryGridProps> = ({ onViewDetails }) => {
       sortBy: sortBy.field,
       sortOrder: sortBy.direction,
     }),
+    staleTime: 0, // Always consider data stale
+    refetchOnMount: 'always', // Always refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window regains focus
   });
 
   const machinery = machineryResponse?.data || [];
+
+  // Debug: Log machinery data and filters
+  console.log('🔍 MachineryGrid Debug:', {
+    totalMachinery: machinery.length,
+    filters: filters,
+    machineryResponse: machineryResponse,
+    firstMachinery: machinery[0],
+  });
 
   const sortOptions = [
     { value: 'name:asc', label: 'Nombre (A-Z)' },
