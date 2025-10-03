@@ -78,9 +78,14 @@ export const getMachinery = async (req: Request, res: Response) => {
       } : null
     });
 
-    // Apply weight and power filters if specified
+    // Apply weight and power filters ONLY if they are meaningful (not default extreme values)
     let filteredMachinery = machinery;
-    if (weightMin || weightMax || powerMin || powerMax) {
+    const hasWeightFilter = (weightMin && weightMin > 0) || (weightMax && weightMax < 1000000);
+    const hasPowerFilter = (powerMin && powerMin > 0) || (powerMax && powerMax < 1000000);
+    
+    if (hasWeightFilter || hasPowerFilter) {
+      console.log('🔍 Applying weight/power filters:', { weightMin, weightMax, powerMin, powerMax, hasWeightFilter, hasPowerFilter });
+      
       filteredMachinery = machinery.filter((m: any) => {
         if (!m.specifications) {
           console.log(`❌ ${m.name} - No specifications`);
@@ -100,26 +105,35 @@ export const getMachinery = async (req: Request, res: Response) => {
         
         console.log(`🔍 Checking ${m.name}:`, { weight, power, weightMin, weightMax, powerMin, powerMax });
         
-        if (weightMin && weight < weightMin) {
-          console.log(`❌ ${m.name} - Weight ${weight} < ${weightMin}`);
-          return false;
+        // Only apply weight filters if they are meaningful
+        if (hasWeightFilter) {
+          if (weightMin && weightMin > 0 && weight < weightMin) {
+            console.log(`❌ ${m.name} - Weight ${weight} < ${weightMin}`);
+            return false;
+          }
+          if (weightMax && weightMax < 1000000 && weight > weightMax) {
+            console.log(`❌ ${m.name} - Weight ${weight} > ${weightMax}`);
+            return false;
+          }
         }
-        if (weightMax && weight > weightMax) {
-          console.log(`❌ ${m.name} - Weight ${weight} > ${weightMax}`);
-          return false;
-        }
-        if (powerMin && power < powerMin) {
-          console.log(`❌ ${m.name} - Power ${power} < ${powerMin}`);
-          return false;
-        }
-        if (powerMax && power > powerMax) {
-          console.log(`❌ ${m.name} - Power ${power} > ${powerMax}`);
-          return false;
+        
+        // Only apply power filters if they are meaningful
+        if (hasPowerFilter) {
+          if (powerMin && powerMin > 0 && power < powerMin) {
+            console.log(`❌ ${m.name} - Power ${power} < ${powerMin}`);
+            return false;
+          }
+          if (powerMax && powerMax < 1000000 && power > powerMax) {
+            console.log(`❌ ${m.name} - Power ${power} > ${powerMax}`);
+            return false;
+          }
         }
         
         console.log(`✅ ${m.name} - PASSED filters`);
         return true;
       });
+    } else {
+      console.log('✅ No weight/power filters applied - showing all machinery');
     }
 
     console.log('🔍 Backend Debug - After filtering:', {
