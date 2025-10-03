@@ -84,6 +84,7 @@ const MachineryComparison: React.FC = () => {
           regionOfferings: data.regionOfferings ? data.regionOfferings.split(',').map((s: string) => s.trim()) : [],
           canopyVersionWeight: data.canopyVersionWeight,
           cabVersionWeight: data.cabVersionWeight,
+          operatingWeightRange: data.operatingWeightRange,
           bucketCapacity: data.bucketCapacity,
           emissionStandardEU: data.emissionStandardEU,
           emissionStandardEPA: data.emissionStandardEPA,
@@ -94,6 +95,7 @@ const MachineryComparison: React.FC = () => {
           numberOfCylinders: data.numberOfCylinders,
           boreByStroke: data.boreByStroke,
           pistonDisplacement: data.pistonDisplacement,
+          ratedPowerISO14396: data.ratedPowerISO14396,
           implementCircuit: data.implementCircuit,
           swingCircuit: data.swingCircuit,
           travelCircuit: data.travelCircuit,
@@ -352,6 +354,7 @@ const MachineryComparison: React.FC = () => {
                       regionOfferings: selectedMachinery.specifications.regionOfferings?.join(', '),
                       canopyVersionWeight: selectedMachinery.specifications.canopyVersionWeight,
                       cabVersionWeight: selectedMachinery.specifications.cabVersionWeight,
+                      operatingWeightRange: selectedMachinery.specifications.operatingWeightRange,
                       bucketCapacity: selectedMachinery.specifications.bucketCapacity,
                       emissionStandardEU: selectedMachinery.specifications.emissionStandardEU,
                       emissionStandardEPA: selectedMachinery.specifications.emissionStandardEPA,
@@ -362,6 +365,7 @@ const MachineryComparison: React.FC = () => {
                       numberOfCylinders: selectedMachinery.specifications.numberOfCylinders,
                       boreByStroke: selectedMachinery.specifications.boreByStroke,
                       pistonDisplacement: selectedMachinery.specifications.pistonDisplacement,
+                      ratedPowerISO14396: selectedMachinery.specifications.ratedPowerISO14396,
                       implementCircuit: selectedMachinery.specifications.implementCircuit,
                       swingCircuit: selectedMachinery.specifications.swingCircuit,
                       travelCircuit: selectedMachinery.specifications.travelCircuit,
@@ -408,7 +412,13 @@ const MachineryComparison: React.FC = () => {
                           <dd className="text-lg font-semibold text-gray-900">
                             {selectedMachinery.specifications.cabVersionWeight?.toFixed(0) || '—'}
                           </dd>
-                    </div>
+                        </div>
+                        <div>
+                          <dt className="text-sm text-gray-500">3.3 Operating Weight Range (kg)</dt>
+                          <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.operatingWeightRange?.toFixed(0) || '—'}
+                          </dd>
+                        </div>
                   </div>
                 </div>
 
@@ -485,6 +495,12 @@ const MachineryComparison: React.FC = () => {
                           <dt className="text-sm text-gray-500">7.6 Piston Displacement (L)</dt>
                           <dd className="text-lg font-semibold text-gray-900">
                             {selectedMachinery.specifications.pistonDisplacement || '—'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm text-gray-500">7.7 ISO14396 (kW)</dt>
+                          <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.ratedPowerISO14396 || '—'}
                           </dd>
                         </div>
                       </div>

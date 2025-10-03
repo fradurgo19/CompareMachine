@@ -115,9 +115,10 @@ const ExcelSpecificationParser: React.FC<ExcelSpecificationParserProps> = ({ onP
           'Manufacturer': 'Hitachi',
           'Category': 'EXCAVATORS',
           'Region Offerings': 'SE Asia, Oceania, Europe',
-          'Canopy Version Weight (kg)': 3770,
-          'Cab Version Weight (kg)': 3940,
-          'Bucket Capacity (m³)': 0.10,
+        'Canopy Version Weight (kg)': 3770,
+        'Cab Version Weight (kg)': 3940,
+        'Operating Weight Range (kg)': 4000,
+        'Bucket Capacity (m³)': 0.10,
           'Emission Standard EU': 'Stage III A',
           'Emission Standard EPA': 'Interim Tier4',
           'Engine Model': 'Yanmar EDM-3TNV88',
@@ -125,9 +126,10 @@ const ExcelSpecificationParser: React.FC<ExcelSpecificationParserProps> = ({ onP
           'Rated Power SAE J1349 (kW)': 21.2,
           'Rated Power EEC 80/1269 (kW)': 21.2,
           'Number of Cylinders': 3,
-          'Bore x Stroke (mm)': '88 x 90',
-          'Piston Displacement (L)': 1.642,
-          'Implement Circuit (MPa)': 24.5,
+        'Bore x Stroke (mm)': '88 x 90',
+        'Piston Displacement (L)': 1.642,
+        'Rated Power ISO14396 (kW)': 21.2,
+        'Implement Circuit (MPa)': 24.5,
           'Swing Circuit (MPa)': 18.6,
           'Travel Circuit (MPa)': 24.5,
           'Max Travel Speed High (km/h)': 4.3,
@@ -145,12 +147,12 @@ const ExcelSpecificationParser: React.FC<ExcelSpecificationParserProps> = ({ onP
       // Create worksheet from data
       const worksheet = XLSX.utils.json_to_sheet(templateData);
       
-      // Set column widths for better readability
+      // Set column widths for better readability (30 columns)
       worksheet['!cols'] = [
         { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 30 },
-        { wch: 20 }, { wch: 20 }, { wch: 18 }, { wch: 20 }, { wch: 20 },
+        { wch: 20 }, { wch: 20 }, { wch: 25 }, { wch: 18 }, { wch: 20 }, { wch: 20 },
         { wch: 20 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 18 },
-        { wch: 18 }, { wch: 20 }, { wch: 20 }, { wch: 18 }, { wch: 18 },
+        { wch: 18 }, { wch: 20 }, { wch: 25 }, { wch: 20 }, { wch: 18 }, { wch: 18 },
         { wch: 25 }, { wch: 25 }, { wch: 18 }, { wch: 25 }, { wch: 22 },
         { wch: 22 }, { wch: 15 }, { wch: 20 }, { wch: 12 }
       ];

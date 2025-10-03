@@ -56,8 +56,9 @@ model MachinerySpecifications {
   regionOfferings String[]
 
   // Operating Weight Range
-  canopyVersionWeight Float? // kg
-  cabVersionWeight    Float? // kg
+  canopyVersionWeight    Float? // kg
+  cabVersionWeight       Float? // kg
+  operatingWeightRange   Float? // kg
 
   // Bucket Capacity Range (ISO heaped)
   bucketCapacity Float? // m³
@@ -76,6 +77,7 @@ model MachinerySpecifications {
   numberOfCylinders    Int?
   boreByStroke         String? // mm (e.g., "88 x 90")
   pistonDisplacement   Float? // L
+  ratedPowerISO14396   Float? // kW
 
   // Relief Valve Settings
   implementCircuit          Float? // MPa

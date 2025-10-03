@@ -14,6 +14,7 @@ const templateData = [
     'Region Offerings': 'SE Asia, Oceania, Europe',
     'Canopy Version Weight (kg)': 3770,
     'Cab Version Weight (kg)': 3940,
+    'Operating Weight Range (kg)': 4000,
     'Bucket Capacity (m³)': 0.10,
     'Emission Standard EU': 'Stage III A',
     'Emission Standard EPA': 'Interim Tier4',
@@ -24,6 +25,7 @@ const templateData = [
     'Number of Cylinders': 3,
     'Bore x Stroke (mm)': '88 x 90',
     'Piston Displacement (L)': 1.642,
+    'Rated Power ISO14396 (kW)': 21.2,
     'Implement Circuit (MPa)': 24.5,
     'Swing Circuit (MPa)': 18.6,
     'Travel Circuit (MPa)': 24.5,
@@ -42,12 +44,12 @@ const templateData = [
 // Create worksheet
 const worksheet = XLSX.utils.json_to_sheet(templateData);
 
-// Set column widths (28 columns - Series and Price removed)
+// Set column widths (30 columns - added operatingWeightRange and ratedPowerISO14396)
 worksheet['!cols'] = [
   { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 30 },
-  { wch: 20 }, { wch: 20 }, { wch: 18 }, { wch: 20 }, { wch: 20 },
+  { wch: 20 }, { wch: 20 }, { wch: 25 }, { wch: 18 }, { wch: 20 }, { wch: 20 },
   { wch: 20 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 18 },
-  { wch: 18 }, { wch: 20 }, { wch: 20 }, { wch: 18 }, { wch: 18 },
+  { wch: 18 }, { wch: 20 }, { wch: 25 }, { wch: 20 }, { wch: 18 }, { wch: 18 },
   { wch: 25 }, { wch: 25 }, { wch: 18 }, { wch: 25 }, { wch: 22 },
   { wch: 22 }, { wch: 15 }, { wch: 20 }, { wch: 12 }
 ];

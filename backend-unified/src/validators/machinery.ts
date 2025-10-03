@@ -7,6 +7,7 @@ export const machinerySpecificationsSchema = z.object({
   // Operating Weight Range
   canopyVersionWeight: z.number().nonnegative().optional(),  // kg
   cabVersionWeight: z.number().nonnegative().optional(),     // kg
+  operatingWeightRange: z.number().nonnegative().optional(), // kg
   
   // Bucket Capacity
   bucketCapacity: z.number().nonnegative().optional(),  // m³
@@ -25,6 +26,7 @@ export const machinerySpecificationsSchema = z.object({
   numberOfCylinders: z.number().int().nonnegative().optional(),
   boreByStroke: z.string().optional(),        // mm
   pistonDisplacement: z.number().nonnegative().optional(),  // L
+  ratedPowerISO14396: z.number().nonnegative().optional(),  // kW
   
   // Relief Valve Settings
   implementCircuit: z.number().nonnegative().optional(),    // MPa
