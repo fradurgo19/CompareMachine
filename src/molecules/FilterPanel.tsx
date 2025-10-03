@@ -31,26 +31,14 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose }) => {
   const categoryOptions = [
     { value: 'all', label: 'All Categories' },
     { value: 'excavators', label: 'Excavators' },
-    { value: 'bulldozers', label: 'Bulldozers' },
-    { value: 'loaders', label: 'Loaders' },
-    { value: 'cranes', label: 'Cranes' },
-    { value: 'dump-trucks', label: 'Dump Trucks' },
-    { value: 'compactors', label: 'Compactors' },
-    { value: 'graders', label: 'Graders' },
   ];
 
+  // Fixed list of manufacturers
   const manufacturerOptions = [
     { value: '', label: 'All Manufacturers' },
-    ...manufacturers.map(manufacturer => ({
-      value: manufacturer,
-      label: manufacturer
-    }))
-  ];
-
-  const availabilityOptions = [
-    { value: 'all', label: 'All Availability' },
-    { value: 'available', label: 'Available' },
-    { value: 'limited', label: 'Limited' },
+    { value: 'Hitachi', label: 'Hitachi' },
+    { value: 'Case', label: 'Case' },
+    { value: 'Liugong', label: 'Liugong' },
   ];
 
   const handleApplyFilters = () => {
@@ -110,68 +98,6 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose }) => {
               manufacturer: e.target.value
             })}
           />
-
-          <Select
-            label="Availability"
-            options={availabilityOptions}
-            value={localFilters.availability}
-            onChange={(e) => setLocalFilters({
-              ...localFilters,
-              availability: e.target.value as 'all' | 'available' | 'limited'
-            })}
-          />
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Weight Range (tons)
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              <Input
-                type="number"
-                placeholder="Min"
-                value={localFilters.weightRange[0] || ''}
-                onChange={(e) => setLocalFilters({
-                  ...localFilters,
-                  weightRange: [Number(e.target.value) || 0, localFilters.weightRange[1]]
-                })}
-              />
-              <Input
-                type="number"
-                placeholder="Max"
-                value={localFilters.weightRange[1] || ''}
-                onChange={(e) => setLocalFilters({
-                  ...localFilters,
-                  weightRange: [localFilters.weightRange[0], Number(e.target.value) || 100]
-                })}
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Power Range (HP)
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              <Input
-                type="number"
-                placeholder="Min"
-                value={localFilters.powerRange[0] || ''}
-                onChange={(e) => setLocalFilters({
-                  ...localFilters,
-                  powerRange: [Number(e.target.value) || 0, localFilters.powerRange[1]]
-                })}
-              />
-              <Input
-                type="number"
-                placeholder="Max"
-                value={localFilters.powerRange[1] || ''}
-                onChange={(e) => setLocalFilters({
-                  ...localFilters,
-                  powerRange: [localFilters.powerRange[0], Number(e.target.value) || 1000]
-                })}
-              />
-            </div>
-          </div>
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-200 bg-white">

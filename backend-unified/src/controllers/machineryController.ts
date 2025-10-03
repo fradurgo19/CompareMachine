@@ -47,8 +47,9 @@ export const getMachinery = async (req: Request, res: Response) => {
     const where: any = {};
 
     // Only filter by category if it's explicitly set (not 'all')
+    // Convert to uppercase to match DB format
     if (category && category !== 'all') {
-      where.category = category;
+      where.category = category.toUpperCase();
     }
 
     // Only filter by manufacturer if it's not empty
