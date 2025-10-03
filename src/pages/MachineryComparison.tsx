@@ -324,10 +324,10 @@ const MachineryComparison: React.FC = () => {
                     </>
                   )}
                   {!isEditMode && (
-                    <Button variant="outline" onClick={handleDownloadReport}>
-                      <Download className="w-4 h-4 mr-2" />
+                  <Button variant="outline" onClick={handleDownloadReport}>
+                    <Download className="w-4 h-4 mr-2" />
                       Descargar
-                    </Button>
+                  </Button>
                   )}
                   <Button variant="ghost" onClick={handleCloseModal}>
                     <X className="w-5 h-5" />
@@ -374,232 +374,192 @@ const MachineryComparison: React.FC = () => {
                   />
                 ) : (
                   /* View Mode - Show Specifications */
-                  <Card>
+                <Card>
                   <h3 className="text-xl font-semibold mb-6 flex items-center">
                     <Wrench className="w-5 h-5 mr-2" />
                     Especificaciones Técnicas Completas
                   </h3>
                   
                   <div className="space-y-6">
-                    {/* Operating Weight Range */}
-                    {(selectedMachinery.specifications.cabVersionWeight || selectedMachinery.specifications.canopyVersionWeight) && (
-                      <div>
-                        <h4 className="text-sm font-semibold text-gray-700 mb-3">Peso de Operación</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {selectedMachinery.specifications.canopyVersionWeight && (
-                            <div>
-                              <dt className="text-sm text-gray-500">Versión Canopy</dt>
-                              <dd className="text-lg font-semibold text-gray-900">
-                                {selectedMachinery.specifications.canopyVersionWeight.toFixed(0)} kg
-                              </dd>
-                            </div>
-                          )}
-                          {selectedMachinery.specifications.cabVersionWeight && (
-                            <div>
-                              <dt className="text-sm text-gray-500">Versión Cab</dt>
-                        <dd className="text-lg font-semibold text-gray-900">
-                                {selectedMachinery.specifications.cabVersionWeight.toFixed(0)} kg
-                        </dd>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                      
-                    {/* Bucket Capacity */}
-                    {selectedMachinery.specifications.bucketCapacity && (
-                      <div>
-                        <h4 className="text-sm font-semibold text-gray-700 mb-3">Capacidad del Balde (ISO heaped)</h4>
-                        <dd className="text-lg font-semibold text-gray-900">
-                          {selectedMachinery.specifications.bucketCapacity} m³
-                        </dd>
-                      </div>
-                    )}
-
-                    {/* Emission Standards */}
-                    {(selectedMachinery.specifications.emissionStandardEU || selectedMachinery.specifications.emissionStandardEPA) && (
-                      <div>
-                        <h4 className="text-sm font-semibold text-gray-700 mb-3">Estándares de Emisión</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {selectedMachinery.specifications.emissionStandardEU && (
-                            <div>
-                              <dt className="text-sm text-gray-500">EU</dt>
-                              <dd className="text-lg font-semibold text-gray-900">
-                                {selectedMachinery.specifications.emissionStandardEU}
-                              </dd>
-                            </div>
-                          )}
-                          {selectedMachinery.specifications.emissionStandardEPA && (
-                            <div>
-                              <dt className="text-sm text-gray-500">EPA</dt>
-                        <dd className="text-lg font-semibold text-gray-900">
-                                {selectedMachinery.specifications.emissionStandardEPA}
-                        </dd>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Engine & Rated Power */}
+                    {/* 2. Region Offerings */}
                     <div>
-                      <h4 className="text-sm font-semibold text-gray-700 mb-3">Motor y Potencia</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <h4 className="text-sm font-semibold text-gray-700 mb-3">2. Region Offerings</h4>
+                      <dd className="text-lg font-semibold text-gray-900">
+                        {selectedMachinery.specifications.regionOfferings && selectedMachinery.specifications.regionOfferings.length > 0
+                          ? selectedMachinery.specifications.regionOfferings.join(', ')
+                          : '—'}
+                      </dd>
+                    </div>
+                    {/* 3. Operating Weight Range */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-700 mb-3">3. Operating Weight Range</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <dt className="text-sm text-gray-500">Modelo del Motor</dt>
+                          <dt className="text-sm text-gray-500">3.1 Canopy Version (kg)</dt>
                           <dd className="text-lg font-semibold text-gray-900">
-                            {selectedMachinery.specifications.engineModel}
+                            {selectedMachinery.specifications.canopyVersionWeight?.toFixed(0) || '—'}
                           </dd>
                         </div>
                         <div>
-                          <dt className="text-sm text-gray-500">Potencia ISO9249 (kW)</dt>
+                          <dt className="text-sm text-gray-500">3.2 Cab Version (kg)</dt>
                           <dd className="text-lg font-semibold text-gray-900">
-                            {selectedMachinery.specifications.ratedPowerISO9249} kW
+                            {selectedMachinery.specifications.cabVersionWeight?.toFixed(0) || '—'}
                           </dd>
-                        </div>
-                        {selectedMachinery.specifications.ratedPowerSAEJ1349 && (
-                          <div>
-                            <dt className="text-sm text-gray-500">Potencia SAE J1349 (kW)</dt>
-                            <dd className="text-lg font-semibold text-gray-900">
-                              {selectedMachinery.specifications.ratedPowerSAEJ1349} kW
-                            </dd>
-                          </div>
-                        )}
-                        {selectedMachinery.specifications.ratedPowerEEC80_1269 && (
-                          <div>
-                            <dt className="text-sm text-gray-500">Potencia EEC 80/1269 (kW)</dt>
-                            <dd className="text-lg font-semibold text-gray-900">
-                              {selectedMachinery.specifications.ratedPowerEEC80_1269} kW
-                            </dd>
-                          </div>
-                        )}
-                        {selectedMachinery.specifications.numberOfCylinders && (
-                          <div>
-                            <dt className="text-sm text-gray-500">No. de Cilindros</dt>
-                            <dd className="text-lg font-semibold text-gray-900">
-                              {selectedMachinery.specifications.numberOfCylinders}
-                            </dd>
-                          </div>
-                        )}
-                        {selectedMachinery.specifications.boreByStroke && (
-                          <div>
-                            <dt className="text-sm text-gray-500">Bore × Stroke (mm)</dt>
-                            <dd className="text-lg font-semibold text-gray-900">
-                              {selectedMachinery.specifications.boreByStroke}
-                          </dd>
-                        </div>
-                      )}
-                        {selectedMachinery.specifications.pistonDisplacement && (
+                    </div>
+                  </div>
+                </div>
+
+                    {/* 4. Bucket Capacity */}
                       <div>
-                            <dt className="text-sm text-gray-500">Desplazamiento del Pistón (L)</dt>
+                      <h4 className="text-sm font-semibold text-gray-700 mb-3">4. Bucket Capacity Range (ISO heaped)</h4>
                         <dd className="text-lg font-semibold text-gray-900">
-                              {selectedMachinery.specifications.pistonDisplacement} L
+                        {selectedMachinery.specifications.bucketCapacity || '—'} m³
                         </dd>
-                          </div>
-                        )}
+                      </div>
+                      
+                    {/* 5. Emission Standard */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-700 mb-3">5. Emission Standard</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                          <dt className="text-sm text-gray-500">5.1 EU</dt>
+                        <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.emissionStandardEU || '—'}
+                        </dd>
+                      </div>
+                      <div>
+                          <dt className="text-sm text-gray-500">5.2 EPA</dt>
+                        <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.emissionStandardEPA || '—'}
+                        </dd>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Relief Valve Settings */}
-                    {(selectedMachinery.specifications.implementCircuit || selectedMachinery.specifications.maxTravelSpeedHigh) && (
-                      <div>
-                        <h4 className="text-sm font-semibold text-gray-700 mb-3">Configuración de Válvulas y Rendimiento</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {selectedMachinery.specifications.implementCircuit && (
-                            <div>
-                              <dt className="text-sm text-gray-500">Circuito de Implementación (MPa)</dt>
-                              <dd className="text-lg font-semibold text-gray-900">
-                                {selectedMachinery.specifications.implementCircuit} MPa
-                              </dd>
-                            </div>
-                          )}
-                          {selectedMachinery.specifications.swingCircuit && (
-                            <div>
-                              <dt className="text-sm text-gray-500">Circuito de Giro (MPa)</dt>
-                              <dd className="text-lg font-semibold text-gray-900">
-                                {selectedMachinery.specifications.swingCircuit} MPa
-                              </dd>
-                            </div>
-                          )}
-                          {selectedMachinery.specifications.travelCircuit && (
-                            <div>
-                              <dt className="text-sm text-gray-500">Circuito de Desplazamiento (MPa)</dt>
-                              <dd className="text-lg font-semibold text-gray-900">
-                                {selectedMachinery.specifications.travelCircuit} MPa
-                              </dd>
-                            </div>
-                          )}
-                          {selectedMachinery.specifications.maxTravelSpeedHigh && (
-                            <div>
-                              <dt className="text-sm text-gray-500">Vel. Máx. Desplazamiento</dt>
-                              <dd className="text-lg font-semibold text-gray-900">
-                                {selectedMachinery.specifications.maxTravelSpeedHigh} / {selectedMachinery.specifications.maxTravelSpeedLow} km/h
-                              </dd>
-                            </div>
-                          )}
-                          {selectedMachinery.specifications.swingSpeed && (
-                            <div>
-                              <dt className="text-sm text-gray-500">Velocidad de Giro (min⁻¹)</dt>
-                        <dd className="text-lg font-semibold text-gray-900">
-                                {selectedMachinery.specifications.swingSpeed} min⁻¹
-                        </dd>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Undercarriage */}
-                    {(selectedMachinery.specifications.undercarriageLength || selectedMachinery.specifications.standardTrackShoeWidth) && (
-                      <div>
-                        <h4 className="text-sm font-semibold text-gray-700 mb-3">Tren de Rodaje</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {selectedMachinery.specifications.standardTrackShoeWidth && (
-                            <div>
-                              <dt className="text-sm text-gray-500">Ancho Zapata Estándar (mm)</dt>
-                              <dd className="text-lg font-semibold text-gray-900">
-                                {selectedMachinery.specifications.standardTrackShoeWidth} mm
-                              </dd>
-                            </div>
-                          )}
-                          {selectedMachinery.specifications.undercarriageLength && (
-                            <div>
-                              <dt className="text-sm text-gray-500">Longitud Tren de Rodaje (mm)</dt>
-                              <dd className="text-lg font-semibold text-gray-900">
-                                {selectedMachinery.specifications.undercarriageLength} mm
-                              </dd>
-                            </div>
-                          )}
-                          {selectedMachinery.specifications.undercarriageWidth && (
-                            <div>
-                              <dt className="text-sm text-gray-500">Ancho Tren de Rodaje (mm)</dt>
-                        <dd className="text-lg font-semibold text-gray-900">
-                                {selectedMachinery.specifications.undercarriageWidth} mm
-                        </dd>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Capacity (Refilled) */}
+                    {/* 6. Engine Model */}
                     <div>
-                      <h4 className="text-sm font-semibold text-gray-700 mb-3">Capacidades (Rellenado)</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <h4 className="text-sm font-semibold text-gray-700 mb-3">6. Engine Model</h4>
+                      <dd className="text-lg font-semibold text-gray-900">
+                        {selectedMachinery.specifications.engineModel || '—'}
+                      </dd>
+                    </div>
+
+                    {/* 7. Rated Power */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-700 mb-3">7. Rated Power</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
-                          <dt className="text-sm text-gray-500">Tanque de Combustible (L)</dt>
+                          <dt className="text-sm text-gray-500">7.1 ISO9249,net (kW)</dt>
                           <dd className="text-lg font-semibold text-gray-900">
-                            {selectedMachinery.specifications.fuelTankCapacity} L
+                            {selectedMachinery.specifications.ratedPowerISO9249 || '—'}
                           </dd>
                         </div>
-                        {selectedMachinery.specifications.hydraulicSystemCapacity && (
-                      <div>
-                            <dt className="text-sm text-gray-500">Sistema Hidráulico incl. tanque (L)</dt>
-                        <dd className="text-lg font-semibold text-gray-900">
-                              {selectedMachinery.specifications.hydraulicSystemCapacity} L
-                        </dd>
-                          </div>
-                        )}
+                        <div>
+                          <dt className="text-sm text-gray-500">7.2 SAE J1349, net (kW)</dt>
+                          <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.ratedPowerSAEJ1349 || '—'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm text-gray-500">7.3 EEC 80/1269, net (kW)</dt>
+                          <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.ratedPowerEEC80_1269 || '—'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm text-gray-500">7.4 No. of Cylinders</dt>
+                          <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.numberOfCylinders || '—'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm text-gray-500">7.5 Bore × Stroke (mm)</dt>
+                          <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.boreByStroke || '—'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm text-gray-500">7.6 Piston Displacement (L)</dt>
+                          <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.pistonDisplacement || '—'}
+                          </dd>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 8. Relief Valve Settings */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-700 mb-3">8. Relief Valve Settings</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                          <dt className="text-sm text-gray-500">8.1 Implement Circuit (MPa)</dt>
+                          <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.implementCircuit || '—'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm text-gray-500">8.2 Swing Circuit (MPa)</dt>
+                          <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.swingCircuit || '—'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm text-gray-500">8.3 Travel Circuit (MPa)</dt>
+                          <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.travelCircuit || '—'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm text-gray-500">8.4 Max. Travel Speed Hi / Low (km/h)</dt>
+                          <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.maxTravelSpeedHigh || '—'} / {selectedMachinery.specifications.maxTravelSpeedLow || '—'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm text-gray-500">8.5 Swing Speed (min⁻¹)</dt>
+                          <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.swingSpeed || '—'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm text-gray-500">8.6 Standard Track Shoe Width (mm)</dt>
+                          <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.standardTrackShoeWidth || '—'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm text-gray-500">8.7 Undercarriage Length (mm)</dt>
+                          <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.undercarriageLength || '—'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm text-gray-500">8.8 Undercarriage Width (mm)</dt>
+                          <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.undercarriageWidth || 
+                             selectedMachinery.specifications.undercarriageWidthExtend || '—'}
+                          </dd>
+                        </div>
+                      </div>
+                    </div>
+
+
+                    {/* 9. Capacity (Refilled) */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-700 mb-3">9. Capacity (Refilled)</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <dt className="text-sm text-gray-500">9.1 Fuel Tank (L)</dt>
+                          <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.fuelTankCapacity || '—'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-sm text-gray-500">9.2 Hydraulic System incl. oil tank (L)</dt>
+                          <dd className="text-lg font-semibold text-gray-900">
+                            {selectedMachinery.specifications.hydraulicSystemCapacity || '—'}
+                          </dd>
+                        </div>
                       </div>
                     </div>
                   </div>
