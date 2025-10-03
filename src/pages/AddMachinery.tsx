@@ -24,8 +24,8 @@ interface MachineryFormData {
   bucketCapacity?: number;
   emissionStandardEU?: string;
   emissionStandardEPA?: string;
-  engineModel: string;
-  ratedPowerISO9249: number;
+  engineModel?: string;
+  ratedPowerISO9249?: number;
   ratedPowerSAEJ1349?: number;
   ratedPowerEEC80_1269?: number;
   numberOfCylinders?: number;
@@ -40,7 +40,7 @@ interface MachineryFormData {
   standardTrackShoeWidth?: number;
   undercarriageLength?: number;
   undercarriageWidth?: number;
-  fuelTankCapacity: number;
+  fuelTankCapacity?: number;
   hydraulicSystemCapacity?: number;
 }
 
@@ -51,13 +51,22 @@ const addMachinery = async (data: MachineryFormData, _images: File[]): Promise<M
     'https://images.pexels.com/photos/1078884/pexels-photo-1078884.jpeg'
   ];
 
+  // Generate name if not provided
+  const name = data.name || `${data.manufacturer || 'Unknown'} ${data.model || 'Unknown'} Excavator`;
+  
+  // Generate series from model if not provided
+  const series = data.series || (data.model?.split('-')[0] || 'Unknown Series');
+  
+  // Default availability
+  const availability = data.availability || 'AVAILABLE';
+
   // Prepare the data for the backend with new specifications
   const machineryData = {
-    name: data.name,
-    model: data.model,
-    series: data.series,
-    category: data.category,
-    manufacturer: data.manufacturer,
+    name,
+    model: data.model || 'Unknown',
+    series,
+    category: data.category || 'EXCAVATORS',
+    manufacturer: data.manufacturer || 'Unknown',
     images: defaultImages,
     specifications: {
       regionOfferings: data.regionOfferings ? data.regionOfferings.split(',').map(s => s.trim()) : [],
@@ -66,8 +75,8 @@ const addMachinery = async (data: MachineryFormData, _images: File[]): Promise<M
       bucketCapacity: data.bucketCapacity,
       emissionStandardEU: data.emissionStandardEU,
       emissionStandardEPA: data.emissionStandardEPA,
-      engineModel: data.engineModel,
-      ratedPowerISO9249: data.ratedPowerISO9249,
+      engineModel: data.engineModel || 'Unknown',
+      ratedPowerISO9249: data.ratedPowerISO9249 || 0,
       ratedPowerSAEJ1349: data.ratedPowerSAEJ1349,
       ratedPowerEEC80_1269: data.ratedPowerEEC80_1269,
       numberOfCylinders: data.numberOfCylinders,
@@ -82,11 +91,11 @@ const addMachinery = async (data: MachineryFormData, _images: File[]): Promise<M
       standardTrackShoeWidth: data.standardTrackShoeWidth,
       undercarriageLength: data.undercarriageLength,
       undercarriageWidth: data.undercarriageWidth,
-      fuelTankCapacity: data.fuelTankCapacity,
+      fuelTankCapacity: data.fuelTankCapacity || 0,
       hydraulicSystemCapacity: data.hydraulicSystemCapacity,
     },
     price: data.price,
-    availability: data.availability,
+    availability: availability,
   };
 
   // Call the real backend API

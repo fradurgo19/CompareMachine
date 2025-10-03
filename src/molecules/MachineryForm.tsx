@@ -11,16 +11,16 @@ import Card from '../atoms/Card';
 import { MachineryCategory } from '../types';
 
 interface MachineryFormData {
-  name: string;
-  model: string;
-  series: string;
-  category: MachineryCategory;
-  manufacturer: string;
+  name?: string;
+  model?: string;
+  series?: string;
+  category?: MachineryCategory;
+  manufacturer?: string;
   price?: number;
-  availability: 'AVAILABLE' | 'LIMITED' | 'UNAVAILABLE';
+  availability?: 'AVAILABLE' | 'LIMITED' | 'UNAVAILABLE';
   
   // Region Offerings
-  regionOfferings: string;
+  regionOfferings?: string;
   
   // Operating Weight Range
   canopyVersionWeight?: number;
@@ -34,8 +34,8 @@ interface MachineryFormData {
   emissionStandardEPA?: string;
   
   // Engine Model & Rated Power
-  engineModel: string;
-  ratedPowerISO9249: number;
+  engineModel?: string;
+  ratedPowerISO9249?: number;
   ratedPowerSAEJ1349?: number;
   ratedPowerEEC80_1269?: number;
   numberOfCylinders?: number;
@@ -54,18 +54,18 @@ interface MachineryFormData {
   undercarriageWidth?: number;
   
   // Capacity
-  fuelTankCapacity: number;
+  fuelTankCapacity?: number;
   hydraulicSystemCapacity?: number;
 }
 
 const schema = yup.object({
-  name: yup.string().required('El nombre es requerido').min(3, 'El nombre debe tener al menos 3 caracteres'),
-  model: yup.string().required('El modelo es requerido'),
-  series: yup.string().required('La serie es requerida'),
-  category: yup.string().required('La categoría es requerida'),
-  manufacturer: yup.string().required('El fabricante es requerido'),
+  name: yup.string().nullable(),
+  model: yup.string().nullable(),
+  series: yup.string().nullable(),
+  category: yup.string().nullable(),
+  manufacturer: yup.string().nullable(),
   price: yup.number().positive('El precio debe ser positivo').nullable(),
-  availability: yup.string().required('La disponibilidad es requerida'),
+  availability: yup.string().nullable(),
   
   regionOfferings: yup.string().nullable(),
   canopyVersionWeight: yup.number().positive().nullable(),
@@ -74,8 +74,8 @@ const schema = yup.object({
   emissionStandardEU: yup.string().nullable(),
   emissionStandardEPA: yup.string().nullable(),
   
-  engineModel: yup.string().required('El modelo del motor es requerido'),
-  ratedPowerISO9249: yup.number().required('La potencia ISO9249 es requerida').positive(),
+  engineModel: yup.string().nullable(),
+  ratedPowerISO9249: yup.number().positive().nullable(),
   ratedPowerSAEJ1349: yup.number().positive().nullable(),
   ratedPowerEEC80_1269: yup.number().positive().nullable(),
   numberOfCylinders: yup.number().integer().positive().nullable(),
@@ -92,7 +92,7 @@ const schema = yup.object({
   undercarriageLength: yup.number().positive().nullable(),
   undercarriageWidth: yup.number().positive().nullable(),
   
-  fuelTankCapacity: yup.number().required('La capacidad de combustible es requerida').positive(),
+  fuelTankCapacity: yup.number().positive().nullable(),
   hydraulicSystemCapacity: yup.number().positive().nullable(),
 });
 
@@ -178,54 +178,24 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Información Básica</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <Input
-                label="1. Modelo *"
+                label="1. Modelo"
                 {...register('model')}
                 error={errors.model?.message}
                 placeholder="ej., ZX38U-5A"
               />
               
-              <Input
-                label="Nombre de la Maquinaria *"
-                {...register('name')}
-                error={errors.name?.message}
-                placeholder="ej., Hitachi ZX38U-5A Excavator"
-              />
-              
-              <Input
-                label="Serie *"
-                {...register('series')}
-                error={errors.series?.message}
-                placeholder="ej., ZX-5A"
-              />
-              
               <Select
-                label="Categoría *"
+                label="Categoría"
                 options={categoryOptions}
                 {...register('category')}
                 error={errors.category?.message}
               />
               
               <Select
-                label="Fabricante *"
+                label="Fabricante"
                 options={manufacturerOptions}
                 {...register('manufacturer')}
                 error={errors.manufacturer?.message}
-              />
-              
-              <Select
-                label="Disponibilidad *"
-                options={availabilityOptions}
-                {...register('availability')}
-                error={errors.availability?.message}
-              />
-              
-              <Input
-                label="Precio (USD)"
-                type="number"
-                step="1000"
-                {...register('price')}
-                error={errors.price?.message}
-                placeholder="285000"
               />
             </div>
           </div>
@@ -303,7 +273,7 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">6. Engine Model</h3>
             <Input
-              label="Engine Model *"
+              label="Engine Model"
               {...register('engineModel')}
               error={errors.engineModel?.message}
               placeholder="Yanmar EDM-3TNV88"
@@ -315,7 +285,7 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
             <h3 className="text-lg font-semibold text-gray-900 mb-4">7. Rated Power</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <Input
-                label="7.1 ISO9249,net (kW) *"
+                label="7.1 ISO9249,net (kW)"
                 type="number"
                 step="0.1"
                 {...register('ratedPowerISO9249')}
@@ -456,7 +426,7 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
             <h3 className="text-lg font-semibold text-gray-900 mb-4">9. Capacity (Refilled)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
-                label="9.1 Fuel Tank (L) *"
+                label="9.1 Fuel Tank (L)"
                 type="number"
                 step="0.1"
                 {...register('fuelTankCapacity')}

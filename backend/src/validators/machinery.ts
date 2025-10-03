@@ -16,10 +16,10 @@ export const machinerySpecificationsSchema = z.object({
   emissionStandardEPA: z.string().optional(),
   
   // Engine Model
-  engineModel: z.string().min(1, 'Engine model is required'),
+  engineModel: z.string().optional().default('Unknown'),
   
   // Rated Power
-  ratedPowerISO9249: z.number().positive('Rated power ISO9249 is required'),  // kW
+  ratedPowerISO9249: z.number().positive().optional().default(0),  // kW
   ratedPowerSAEJ1349: z.number().positive().optional(),  // kW
   ratedPowerEEC80_1269: z.number().positive().optional(), // kW
   numberOfCylinders: z.number().int().positive().optional(),
@@ -40,7 +40,7 @@ export const machinerySpecificationsSchema = z.object({
   undercarriageWidthRetract: z.number().positive().optional(),  // mm
   
   // Capacity (Refilled)
-  fuelTankCapacity: z.number().positive('Fuel tank capacity is required'),  // L
+  fuelTankCapacity: z.number().positive().optional().default(0),  // L
   hydraulicSystemCapacity: z.number().positive().optional(), // L
   
   // Backward compatibility (deprecated but optional)
@@ -57,14 +57,14 @@ export const machinerySpecificationsSchema = z.object({
 });
 
 export const createMachinerySchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  model: z.string().min(1, 'Model is required'),
-  series: z.string().min(1, 'Series is required'),
-  category: z.enum(['EXCAVATORS', 'BULLDOZERS', 'LOADERS', 'CRANES', 'DUMP_TRUCKS', 'COMPACTORS', 'GRADERS']),
-  manufacturer: z.string().min(1, 'Manufacturer is required'),
+  name: z.string().min(1, 'Name is required').optional().default('Unknown Machinery'),
+  model: z.string().min(1, 'Model is required').optional().default('Unknown'),
+  series: z.string().min(1, 'Series is required').optional().default('Unknown Series'),
+  category: z.enum(['EXCAVATORS', 'BULLDOZERS', 'LOADERS', 'CRANES', 'DUMP_TRUCKS', 'COMPACTORS', 'GRADERS']).optional().default('EXCAVATORS'),
+  manufacturer: z.string().min(1, 'Manufacturer is required').optional().default('Unknown'),
   images: z.array(z.string().url('Invalid image URL')).optional().default([]),
   price: z.number().positive().optional(),
-  availability: z.enum(['AVAILABLE', 'LIMITED', 'UNAVAILABLE']).default('AVAILABLE'),
+  availability: z.enum(['AVAILABLE', 'LIMITED', 'UNAVAILABLE']).optional().default('AVAILABLE'),
   rating: z.number().min(0).max(5).default(0),
   specifications: machinerySpecificationsSchema
 });
