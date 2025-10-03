@@ -123,32 +123,6 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose }) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Price Range ($)
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              <Input
-                type="number"
-                placeholder="Min"
-                value={localFilters.priceRange[0] || ''}
-                onChange={(e) => setLocalFilters({
-                  ...localFilters,
-                  priceRange: [Number(e.target.value) || 0, localFilters.priceRange[1]]
-                })}
-              />
-              <Input
-                type="number"
-                placeholder="Max"
-                value={localFilters.priceRange[1] || ''}
-                onChange={(e) => setLocalFilters({
-                  ...localFilters,
-                  priceRange: [localFilters.priceRange[0], Number(e.target.value) || 1000000]
-                })}
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
               Weight Range (tons)
             </label>
             <div className="grid grid-cols-2 gap-2">
