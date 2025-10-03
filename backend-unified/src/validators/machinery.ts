@@ -5,11 +5,11 @@ export const machinerySpecificationsSchema = z.object({
   regionOfferings: z.array(z.string()).optional().default([]),
   
   // Operating Weight Range
-  canopyVersionWeight: z.number().positive().optional(),  // kg
-  cabVersionWeight: z.number().positive().optional(),     // kg
+  canopyVersionWeight: z.number().nonnegative().optional(),  // kg
+  cabVersionWeight: z.number().nonnegative().optional(),     // kg
   
   // Bucket Capacity
-  bucketCapacity: z.number().positive().optional(),  // m³
+  bucketCapacity: z.number().nonnegative().optional(),  // m³
   
   // Emission Standard
   emissionStandardEU: z.string().optional(),
@@ -19,40 +19,40 @@ export const machinerySpecificationsSchema = z.object({
   engineModel: z.string().optional().default('Unknown'),
   
   // Rated Power
-  ratedPowerISO9249: z.number().positive().optional().default(0),  // kW
-  ratedPowerSAEJ1349: z.number().positive().optional(),  // kW
-  ratedPowerEEC80_1269: z.number().positive().optional(), // kW
-  numberOfCylinders: z.number().int().positive().optional(),
+  ratedPowerISO9249: z.number().nonnegative().optional().default(0),  // kW
+  ratedPowerSAEJ1349: z.number().nonnegative().optional(),  // kW
+  ratedPowerEEC80_1269: z.number().nonnegative().optional(), // kW
+  numberOfCylinders: z.number().int().nonnegative().optional(),
   boreByStroke: z.string().optional(),        // mm
-  pistonDisplacement: z.number().positive().optional(),  // L
+  pistonDisplacement: z.number().nonnegative().optional(),  // L
   
   // Relief Valve Settings
-  implementCircuit: z.number().positive().optional(),    // MPa
-  swingCircuit: z.number().positive().optional(),        // MPa
-  travelCircuit: z.number().positive().optional(),       // MPa
-  maxTravelSpeedHigh: z.number().positive().optional(),  // km/h
-  maxTravelSpeedLow: z.number().positive().optional(),   // km/h
-  swingSpeed: z.number().positive().optional(),          // min-1
-  standardTrackShoeWidth: z.number().positive().optional(),  // mm
-  undercarriageLength: z.number().positive().optional(),     // mm
-  undercarriageWidth: z.number().positive().optional(),      // mm
-  undercarriageWidthExtend: z.number().positive().optional(),   // mm
-  undercarriageWidthRetract: z.number().positive().optional(),  // mm
+  implementCircuit: z.number().nonnegative().optional(),    // MPa
+  swingCircuit: z.number().nonnegative().optional(),        // MPa
+  travelCircuit: z.number().nonnegative().optional(),       // MPa
+  maxTravelSpeedHigh: z.number().nonnegative().optional(),  // km/h
+  maxTravelSpeedLow: z.number().nonnegative().optional(),   // km/h
+  swingSpeed: z.number().nonnegative().optional(),          // min-1
+  standardTrackShoeWidth: z.number().nonnegative().optional(),  // mm
+  undercarriageLength: z.number().nonnegative().optional(),     // mm
+  undercarriageWidth: z.number().nonnegative().optional(),      // mm
+  undercarriageWidthExtend: z.number().nonnegative().optional(),   // mm
+  undercarriageWidthRetract: z.number().nonnegative().optional(),  // mm
   
   // Capacity (Refilled)
-  fuelTankCapacity: z.number().positive().optional().default(0),  // L
-  hydraulicSystemCapacity: z.number().positive().optional(), // L
+  fuelTankCapacity: z.number().nonnegative().optional().default(0),  // L
+  hydraulicSystemCapacity: z.number().nonnegative().optional(), // L
   
   // Backward compatibility (deprecated but optional)
-  weight: z.number().positive().optional(),
-  power: z.number().positive().optional(),
-  maxOperatingWeight: z.number().positive().optional(),
-  maxDigDepth: z.number().positive().optional(),
-  maxReach: z.number().positive().optional(),
-  transportLength: z.number().positive().optional(),
-  transportWidth: z.number().positive().optional(),
-  transportHeight: z.number().positive().optional(),
-  fuelCapacity: z.number().positive().optional(),
+  weight: z.number().nonnegative().optional(),
+  power: z.number().nonnegative().optional(),
+  maxOperatingWeight: z.number().nonnegative().optional(),
+  maxDigDepth: z.number().nonnegative().optional(),
+  maxReach: z.number().nonnegative().optional(),
+  transportLength: z.number().nonnegative().optional(),
+  transportWidth: z.number().nonnegative().optional(),
+  transportHeight: z.number().nonnegative().optional(),
+  fuelCapacity: z.number().nonnegative().optional(),
   hydraulicSystem: z.string().optional()
 });
 
