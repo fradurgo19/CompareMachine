@@ -5,13 +5,15 @@ import {
   createMachinery,
   updateMachinery,
   deleteMachinery,
-  getManufacturers
+  getManufacturers,
+  getAllMachineryDirect
 } from '../controllers/machineryController';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 
 const router = Router();
 
 // Public routes
+router.get('/diagnostic/all', getAllMachineryDirect); // TEMPORARY DIAGNOSTIC ENDPOINT
 router.get('/', getMachinery);
 router.get('/manufacturers', getManufacturers);
 router.get('/:id', getMachineryById);

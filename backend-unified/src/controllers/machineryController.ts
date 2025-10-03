@@ -3,6 +3,39 @@ import { prisma } from '../index';
 import { machineryQuerySchema, createMachinerySchema, updateMachinerySchema } from '../validators/machinery';
 import { ApiResponse } from '../types';
 
+// TEMPORARY DIAGNOSTIC ENDPOINT - Returns ALL machinery with NO filters
+export const getAllMachineryDirect = async (req: Request, res: Response) => {
+  try {
+    const allMachinery = await prisma.machinery.findMany({
+      include: {
+        specifications: true
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    console.log('🔍 DIAGNOSTIC - Total machinery in DB:', allMachinery.length);
+    console.log('🔍 DIAGNOSTIC - All names:', allMachinery.map(m => ({ name: m.name, model: m.model, created: m.createdAt })));
+
+    res.json({
+      success: true,
+      data: allMachinery,
+      meta: {
+        total: allMachinery.length,
+        message: 'DIAGNOSTIC ENDPOINT - NO FILTERS APPLIED'
+      }
+    });
+  } catch (error: any) {
+    console.error('Error in diagnostic endpoint:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Diagnostic endpoint failed',
+      error: error.message
+    });
+  }
+};
+
 export const getMachinery = async (req: Request, res: Response) => {
   try {
     const query = machineryQuerySchema.parse(req.query);
