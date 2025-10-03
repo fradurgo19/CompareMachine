@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ArrowLeft } from 'lucide-react';
+import { Plus, ArrowLeft, Copy, FormInput } from 'lucide-react';
 import MachineryForm from '../molecules/MachineryForm';
+import TextSpecificationParser from '../components/TextSpecificationParser';
 import Button from '../atoms/Button';
 import { Machinery } from '../types';
 import api from '../services/api';
@@ -73,10 +74,14 @@ const addMachinery = async (data: MachineryFormData, _images: File[]): Promise<M
   return response.data;
 };
 
+type TabType = 'manual' | 'paste';
+
 const AddMachinery: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>('paste');
+  const [parsedMachinery, setParsedMachinery] = useState<any[]>([]);
 
   const addMachineryMutation = useMutation({
     mutationFn: ({ data, images }: { data: MachineryFormData; images: File[] }) =>
@@ -116,6 +121,50 @@ const AddMachinery: React.FC = () => {
     navigate('/compare');
   };
 
+  const handleParsed = (machinery: any[]) => {
+    setParsedMachinery(machinery);
+  };
+
+  const handleAddParsedMachinery = async () => {
+    if (parsedMachinery.length === 0) {
+      alert('No hay máquinas parseadas para agregar.');
+      return;
+    }
+
+    try {
+      // Add all parsed machinery
+      for (const machinery of parsedMachinery) {
+        const machineryData = {
+          name: machinery.name,
+          model: machinery.model,
+          series: machinery.series,
+          category: machinery.category,
+          manufacturer: machinery.manufacturer,
+          images: ['https://images.pexels.com/photos/1078884/pexels-photo-1078884.jpeg'],
+          specifications: machinery.specifications,
+          price: machinery.price,
+          availability: machinery.availability,
+        };
+
+        await api.createMachinery(machineryData);
+      }
+
+      // Invalidate queries to refetch fresh data
+      queryClient.invalidateQueries({ queryKey: ['machinery'] });
+      queryClient.invalidateQueries({ queryKey: ['manufacturers'] });
+
+      setShowSuccessMessage(true);
+
+      // Navigate back after showing success message
+      setTimeout(() => {
+        navigate('/compare');
+      }, 2000);
+    } catch (error) {
+      console.error('Error adding parsed machinery:', error);
+      alert('Error al agregar las máquinas parseadas. Por favor, inténtalo de nuevo.');
+    }
+  };
+
   if (showSuccessMessage) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -127,7 +176,9 @@ const AddMachinery: React.FC = () => {
             ¡Maquinaria Agregada Exitosamente!
           </h2>
           <p className="text-gray-600 mb-4">
-            La nueva maquinaria ha sido agregada a la base de datos de comparación.
+            {parsedMachinery.length > 0 
+              ? `Se agregaron ${parsedMachinery.length} máquina(s) a la base de datos.`
+              : 'La nueva maquinaria ha sido agregada a la base de datos de comparación.'}
           </p>
           <p className="text-sm text-gray-500">
             Redirigiendo a la página principal...
@@ -158,18 +209,67 @@ const AddMachinery: React.FC = () => {
                 Agregar Nueva Maquinaria
               </h1>
               <p className="text-gray-600 mt-1">
-                Ingresa especificaciones detalladas para comparación de maquinaria
+                Copia y pega especificaciones o ingrésalas manualmente
               </p>
             </div>
           </div>
         </div>
 
-        {/* Form */}
-        <MachineryForm
-          onSubmit={handleSubmit}
-          onCancel={handleCancel}
-          isLoading={addMachineryMutation.isPending}
-        />
+        {/* Tabs */}
+        <div className="mb-6">
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8">
+              <button
+                onClick={() => setActiveTab('paste')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'paste'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-center">
+                  <Copy className="w-5 h-5 mr-2" />
+                  Copiar y Pegar
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab('manual')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'manual'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-center">
+                  <FormInput className="w-5 h-5 mr-2" />
+                  Entrada Manual
+                </div>
+              </button>
+            </nav>
+          </div>
+        </div>
+
+        {/* Content */}
+        {activeTab === 'paste' ? (
+          <div>
+            <TextSpecificationParser onParsed={handleParsed} />
+            
+            {parsedMachinery.length > 0 && (
+              <div className="mt-6 flex justify-end">
+                <Button onClick={handleAddParsedMachinery} size="lg">
+                  <Plus className="w-5 h-5 mr-2" />
+                  Agregar {parsedMachinery.length} Máquina(s)
+                </Button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <MachineryForm
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+            isLoading={addMachineryMutation.isPending}
+          />
+        )}
       </div>
     </div>
   );
