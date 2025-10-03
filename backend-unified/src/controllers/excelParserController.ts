@@ -158,85 +158,42 @@ export const parseExcelSpecifications = async (req: Request, res: Response) => {
 };
 
 /**
- * Generate Excel template for download
+ * Serve static Excel template for download
  */
 export const generateExcelTemplate = (req: Request, res: Response) => {
   try {
-    // Create workbook
-    const workbook = XLSX.utils.book_new();
+    const fs = require('fs');
+    const path = require('path');
     
-    // Define template structure
-    const templateData = [
-      {
-        'Model': 'ZX38U-5A',
-        'Manufacturer': 'Hitachi',
-        'Series': 'ZX-5A',
-        'Category': 'EXCAVATORS',
-        'Region Offerings': 'SE Asia, Oceania, Europe',
-        'Canopy Version Weight (kg)': 3770,
-        'Cab Version Weight (kg)': 3940,
-        'Bucket Capacity (m³)': 0.10,
-        'Emission Standard EU': 'Stage III A',
-        'Emission Standard EPA': 'Interim Tier4',
-        'Engine Model': 'Yanmar EDM-3TNV88',
-        'Rated Power ISO9249 (kW)': 21.2,
-        'Rated Power SAE J1349 (kW)': 21.2,
-        'Rated Power EEC 80/1269 (kW)': 21.2,
-        'Number of Cylinders': 3,
-        'Bore x Stroke (mm)': '88 x 90',
-        'Piston Displacement (L)': 1.642,
-        'Implement Circuit (MPa)': 24.5,
-        'Swing Circuit (MPa)': 18.6,
-        'Travel Circuit (MPa)': 24.5,
-        'Max Travel Speed High (km/h)': 4.3,
-        'Max Travel Speed Low (km/h)': 2.8,
-        'Swing Speed (min-1)': 9.1,
-        'Standard Track Shoe Width (mm)': 300,
-        'Undercarriage Length (mm)': 2110,
-        'Undercarriage Width (mm)': 1740,
-        'Fuel Tank (L)': 42.0,
-        'Hydraulic System (L)': 88.0,
-        'Price': 285000,
-        'Availability': 'AVAILABLE'
-      }
-    ];
+    // Path to static template file
+    const templatePath = path.join(process.cwd(), 'public', 'templates', 'machinery-template.xlsx');
     
-    // Create worksheet
-    const worksheet = XLSX.utils.json_to_sheet(templateData);
+    // Check if file exists
+    if (!fs.existsSync(templatePath)) {
+      res.status(404).json({
+        success: false,
+        message: 'Template file not found',
+      });
+      return;
+    }
     
-    // Set column widths for better readability
-    worksheet['!cols'] = [
-      { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 12 }, { wch: 30 },
-      { wch: 20 }, { wch: 20 }, { wch: 18 }, { wch: 20 }, { wch: 20 },
-      { wch: 20 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 18 },
-      { wch: 18 }, { wch: 20 }, { wch: 20 }, { wch: 18 }, { wch: 18 },
-      { wch: 25 }, { wch: 25 }, { wch: 18 }, { wch: 25 }, { wch: 22 },
-      { wch: 22 }, { wch: 15 }, { wch: 20 }, { wch: 12 }, { wch: 12 }
-    ];
-    
-    // Add worksheet to workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Machinery Template');
-    
-    // Write workbook to buffer
-    const buffer = XLSX.write(workbook, { 
-      type: 'buffer', 
-      bookType: 'xlsx'
-    });
+    // Read file
+    const fileBuffer = fs.readFileSync(templatePath);
     
     // Send file as download
     res.status(200)
       .set({
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'Content-Disposition': 'attachment; filename=machinery-template.xlsx',
-        'Content-Length': buffer.length
+        'Content-Length': fileBuffer.length
       })
-      .send(buffer);
+      .send(fileBuffer);
   } catch (error: any) {
-    console.error('Error generating Excel template:', error);
+    console.error('Error serving Excel template:', error);
     
     res.status(500).json({
       success: false,
-      message: 'Error al generar el template de Excel',
+      message: 'Error al descargar el template de Excel',
       error: error.message,
     });
   }
