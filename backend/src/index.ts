@@ -36,21 +36,17 @@ export const prisma = new PrismaClient({
   }
 });
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'), // limit each IP to 100 requests per windowMs
-  message: {
-    success: false,
-    message: 'Demasiadas solicitudes desde esta IP, por favor intenta más tarde.'
-  },
-  keyGenerator: (req) => {
-    // Use X-Forwarded-For header for Vercel
-    return req.ip || req.connection.remoteAddress || 'unknown';
-  },
-  standardHeaders: true,
-  legacyHeaders: false
-});
+// Rate limiting - disabled temporarily to avoid IPv6 issues in Vercel
+// const limiter = rateLimit({
+//   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'),
+//   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
+//   message: {
+//     success: false,
+//     message: 'Demasiadas solicitudes desde esta IP, por favor intenta más tarde.'
+//   },
+//   standardHeaders: true,
+//   legacyHeaders: false
+// });
 
 // Middleware
 app.use(helmet());
@@ -76,7 +72,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(morgan('combined'));
-app.use(limiter);
+// app.use(limiter); // Disabled temporarily
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
