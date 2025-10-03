@@ -14,9 +14,7 @@ import jointEvaluationRoutes from './routes/jointEvaluation';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/user';
 import initRoutes from './routes/init';
-import debugRoutes from './routes/debug';
-import createAdminRoutes from './routes/create-admin';
-import updateAdminPasswordRoutes from './routes/update-admin-password';
+import textParserRoutes from './routes/textParser';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -100,9 +98,7 @@ app.use('/api/machinery', machineryRoutes);
 app.use('/api/joint-evaluations', jointEvaluationRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/init', initRoutes);
-app.use('/api/debug', debugRoutes);
-app.use('/api/create-admin', createAdminRoutes);
-app.use('/api/update-admin', updateAdminPasswordRoutes);
+app.use('/api/text-parser', textParserRoutes);
 
 // Error handling middleware
 app.use(notFound);
