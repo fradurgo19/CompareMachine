@@ -226,69 +226,6 @@ const MachineryComparison: React.FC = () => {
 
               {/* Modal Content */}
               <div className="p-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                  {/* Images */}
-                  <div className="space-y-4">
-                    <img
-                      src={selectedMachinery.images[0]}
-                      alt={selectedMachinery.name}
-                      className="w-full h-64 object-cover rounded-lg"
-                    />
-                    {selectedMachinery.images.length > 1 && (
-                      <div className="grid grid-cols-2 gap-2">
-                        {selectedMachinery.images.slice(1).map((image, index) => (
-                          <img
-                            key={index}
-                            src={image}
-                            alt={`${selectedMachinery.name} ${index + 2}`}
-                            className="w-full h-24 object-cover rounded"
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Basic Information */}
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <Star className="w-5 h-5 text-yellow-400 fill-current mr-2" />
-                        <span className="text-lg font-medium">{selectedMachinery.rating}</span>
-                      </div>
-                      <Badge variant={
-                        selectedMachinery.availability === 'available' ? 'success' :
-                        selectedMachinery.availability === 'limited' ? 'warning' : 'error'
-                      }>
-                        {selectedMachinery.availability.charAt(0).toUpperCase() + 
-                         selectedMachinery.availability.slice(1)}
-                      </Badge>
-                    </div>
-
-                    {selectedMachinery.price && (
-                      <div>
-                        <h3 className="text-lg font-semibold mb-2">Precio</h3>
-                        <p className="text-3xl font-bold text-blue-600">
-                          ${selectedMachinery.price.toLocaleString()}
-                        </p>
-                      </div>
-                    )}
-
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">Categoría</h3>
-                      <p className="text-gray-600 capitalize">
-                        {selectedMachinery.category.replace('-', ' ')}
-                      </p>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">Información de Serie</h3>
-                      <p className="text-gray-600">
-                        Serie: {selectedMachinery.series}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Detailed Specifications */}
                 <Card>
                   <h3 className="text-xl font-semibold mb-6 flex items-center">
