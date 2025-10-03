@@ -7,9 +7,8 @@ import Button from '../atoms/Button';
 import Input from '../atoms/Input';
 import Select from '../atoms/Select';
 import TextArea from '../atoms/TextArea';
-import FileUpload from '../atoms/FileUpload';
 import Card from '../atoms/Card';
-import { Machinery, MachineryCategory } from '../types';
+import { MachineryCategory } from '../types';
 
 interface MachineryFormData {
   name: string;
@@ -19,20 +18,44 @@ interface MachineryFormData {
   manufacturer: string;
   price?: number;
   availability: 'AVAILABLE' | 'LIMITED' | 'UNAVAILABLE';
-  // Specifications
-  weight: number;
-  power: number;
-  maxOperatingWeight: number;
+  
+  // Region Offerings
+  regionOfferings: string;
+  
+  // Operating Weight Range
+  canopyVersionWeight?: number;
+  cabVersionWeight?: number;
+  
+  // Bucket Capacity
   bucketCapacity?: number;
-  maxDigDepth?: number;
-  maxReach?: number;
-  transportLength: number;
-  transportWidth: number;
-  transportHeight: number;
+  
+  // Emission Standards
+  emissionStandardEU?: string;
+  emissionStandardEPA?: string;
+  
+  // Engine Model & Rated Power
   engineModel: string;
-  fuelCapacity: number;
-  hydraulicSystem?: string;
-  // Additional fields
+  ratedPowerISO9249: number;
+  ratedPowerSAEJ1349?: number;
+  ratedPowerEEC80_1269?: number;
+  numberOfCylinders?: number;
+  boreByStroke?: string;
+  pistonDisplacement?: number;
+  
+  // Relief Valve Settings
+  implementCircuit?: number;
+  swingCircuit?: number;
+  travelCircuit?: number;
+  maxTravelSpeedHigh?: number;
+  maxTravelSpeedLow?: number;
+  swingSpeed?: number;
+  standardTrackShoeWidth?: number;
+  undercarriageLength?: number;
+  undercarriageWidth?: number;
+  
+  // Capacity
+  fuelTankCapacity: number;
+  hydraulicSystemCapacity?: number;
 }
 
 const schema = yup.object({
@@ -43,18 +66,34 @@ const schema = yup.object({
   manufacturer: yup.string().required('El fabricante es requerido'),
   price: yup.number().positive('El precio debe ser positivo').nullable(),
   availability: yup.string().required('La disponibilidad es requerida'),
-  weight: yup.number().required('El peso es requerido').positive('El peso debe ser positivo'),
-  power: yup.number().required('La potencia es requerida').positive('La potencia debe ser positiva'),
-  maxOperatingWeight: yup.number().required('El peso máximo de operación es requerido').positive(),
-  bucketCapacity: yup.number().positive('La capacidad del balde debe ser positiva').nullable(),
-  maxDigDepth: yup.number().positive('La profundidad máxima de excavación debe ser positiva').nullable(),
-  maxReach: yup.number().positive('El alcance máximo debe ser positivo').nullable(),
-  transportLength: yup.number().required('La longitud de transporte es requerida').positive(),
-  transportWidth: yup.number().required('El ancho de transporte es requerido').positive(),
-  transportHeight: yup.number().required('La altura de transporte es requerida').positive(),
+  
+  regionOfferings: yup.string().nullable(),
+  canopyVersionWeight: yup.number().positive().nullable(),
+  cabVersionWeight: yup.number().positive().nullable(),
+  bucketCapacity: yup.number().positive().nullable(),
+  emissionStandardEU: yup.string().nullable(),
+  emissionStandardEPA: yup.string().nullable(),
+  
   engineModel: yup.string().required('El modelo del motor es requerido'),
-  fuelCapacity: yup.number().required('La capacidad de combustible es requerida').positive(),
-  hydraulicSystem: yup.string().nullable(),
+  ratedPowerISO9249: yup.number().required('La potencia ISO9249 es requerida').positive(),
+  ratedPowerSAEJ1349: yup.number().positive().nullable(),
+  ratedPowerEEC80_1269: yup.number().positive().nullable(),
+  numberOfCylinders: yup.number().integer().positive().nullable(),
+  boreByStroke: yup.string().nullable(),
+  pistonDisplacement: yup.number().positive().nullable(),
+  
+  implementCircuit: yup.number().positive().nullable(),
+  swingCircuit: yup.number().positive().nullable(),
+  travelCircuit: yup.number().positive().nullable(),
+  maxTravelSpeedHigh: yup.number().positive().nullable(),
+  maxTravelSpeedLow: yup.number().positive().nullable(),
+  swingSpeed: yup.number().positive().nullable(),
+  standardTrackShoeWidth: yup.number().positive().nullable(),
+  undercarriageLength: yup.number().positive().nullable(),
+  undercarriageWidth: yup.number().positive().nullable(),
+  
+  fuelTankCapacity: yup.number().required('La capacidad de combustible es requerida').positive(),
+  hydraulicSystemCapacity: yup.number().positive().nullable(),
 });
 
 interface MachineryFormProps {
@@ -76,8 +115,6 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    watch,
-    setValue
   } = useForm<MachineryFormData>({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -86,8 +123,6 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
       ...initialData
     }
   });
-
-  const selectedCategory = watch('category');
 
   const categoryOptions = [
     { value: 'EXCAVATORS', label: 'Excavadoras' },
@@ -107,11 +142,11 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
 
   const manufacturerOptions = [
     { value: 'Caterpillar', label: 'Caterpillar' },
-    { value: 'John Deere', label: 'John Deere' },
+    { value: 'Hitachi', label: 'Hitachi' },
     { value: 'Komatsu', label: 'Komatsu' },
     { value: 'Volvo', label: 'Volvo' },
     { value: 'Liebherr', label: 'Liebherr' },
-    { value: 'Hitachi', label: 'Hitachi' },
+    { value: 'John Deere', label: 'John Deere' },
     { value: 'Case', label: 'Case' },
     { value: 'JCB', label: 'JCB' },
     { value: 'Other', label: 'Otro' },
@@ -125,11 +160,8 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
     }
   };
 
-  const showExcavatorFields = selectedCategory === 'EXCAVATORS';
-  const showLoaderFields = selectedCategory === 'LOADERS';
-
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       <Card>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">
@@ -144,26 +176,26 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
           {/* Basic Information */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Información Básica</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Input
+                label="1. Modelo *"
+                {...register('model')}
+                error={errors.model?.message}
+                placeholder="ej., ZX38U-5A"
+              />
+              
               <Input
                 label="Nombre de la Maquinaria *"
                 {...register('name')}
                 error={errors.name?.message}
-                placeholder="ej., Excavadora Hidráulica CAT 320"
-              />
-              
-              <Input
-                label="Modelo *"
-                {...register('model')}
-                error={errors.model?.message}
-                placeholder="e.g., 320"
+                placeholder="ej., Hitachi ZX38U-5A Excavator"
               />
               
               <Input
                 label="Serie *"
                 {...register('series')}
                 error={errors.series?.message}
-                placeholder="ej., Nueva Generación"
+                placeholder="ej., ZX-5A"
               />
               
               <Select
@@ -196,147 +228,251 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
                 placeholder="285000"
               />
             </div>
-            
           </div>
 
-          {/* Technical Specifications */}
+          {/* 2. Region Offerings */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Especificaciones Técnicas</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">2. Region Offerings</h3>
+            <TextArea
+              label="Regiones (separadas por coma)"
+              {...register('regionOfferings')}
+              error={errors.regionOfferings?.message}
+              placeholder="SE Asia, Oceania, Europe, Russia・CIS, Africa, Middle East"
+              rows={2}
+            />
+          </div>
+
+          {/* 3. Operating Weight Range */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">3. Operating Weight Range</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
-                label="Peso de Operación (toneladas) *"
+                label="3.1 Canopy Version (kg)"
                 type="number"
-                step="0.1"
-                {...register('weight')}
-                error={errors.weight?.message}
-                placeholder="20.2"
+                step="1"
+                {...register('canopyVersionWeight')}
+                error={errors.canopyVersionWeight?.message}
+                placeholder="3770"
               />
               
               <Input
-                label="Engine Power (HP) *"
+                label="3.2 Cab Version (kg)"
                 type="number"
-                {...register('power')}
-                error={errors.power?.message}
-                placeholder="122"
-              />
-              
-              <Input
-                label="Max Operating Weight (kg) *"
-                type="number"
-                {...register('maxOperatingWeight')}
-                error={errors.maxOperatingWeight?.message}
-                placeholder="20200"
-              />
-              
-              <Input
-                label="Engine Model *"
-                {...register('engineModel')}
-                error={errors.engineModel?.message}
-                placeholder="Cat C4.4 ACERT"
-              />
-              
-              <Input
-                label="Fuel Capacity (L) *"
-                type="number"
-                {...register('fuelCapacity')}
-                error={errors.fuelCapacity?.message}
-                placeholder="410"
-              />
-              
-              <Input
-                label="Hydraulic System"
-                {...register('hydraulicSystem')}
-                error={errors.hydraulicSystem?.message}
-                placeholder="Advanced Hydraulic System"
+                step="1"
+                {...register('cabVersionWeight')}
+                error={errors.cabVersionWeight?.message}
+                placeholder="3940"
               />
             </div>
           </div>
 
-          {/* Category-Specific Fields */}
-          {(showExcavatorFields || showLoaderFields) && (
+          {/* 4. Bucket Capacity */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">4. Bucket Capacity Range (ISO heaped)</h3>
+            <Input
+              label="Bucket Capacity (m³)"
+              type="number"
+              step="0.01"
+              {...register('bucketCapacity')}
+              error={errors.bucketCapacity?.message}
+              placeholder="0.10"
+            />
+          </div>
+
+          {/* 5. Emission Standards */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">5. Emission Standard</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="5.1 EU Standard"
+                {...register('emissionStandardEU')}
+                error={errors.emissionStandardEU?.message}
+                placeholder="Stage III A"
+              />
+              
+              <Input
+                label="5.2 EPA Standard"
+                {...register('emissionStandardEPA')}
+                error={errors.emissionStandardEPA?.message}
+                placeholder="Interim Tier4"
+              />
+            </div>
+            </div>
+            
+          {/* 6. Engine Model */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">6. Engine Model</h3>
+            <Input
+              label="Engine Model *"
+              {...register('engineModel')}
+              error={errors.engineModel?.message}
+              placeholder="Yanmar EDM-3TNV88"
+            />
+          </div>
+
+          {/* 7. Rated Power */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">7. Rated Power</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Input
+                label="7.1 ISO9249,net (kW) *"
+                type="number"
+                step="0.1"
+                {...register('ratedPowerISO9249')}
+                error={errors.ratedPowerISO9249?.message}
+                placeholder="21.2"
+              />
+              
+              <Input
+                label="7.2 SAE J1349, net (kW)"
+                type="number"
+                step="0.1"
+                {...register('ratedPowerSAEJ1349')}
+                error={errors.ratedPowerSAEJ1349?.message}
+                placeholder="21.2"
+              />
+              
+              <Input
+                label="7.3 EEC 80/1269, net (kW)"
+                type="number"
+                step="0.1"
+                {...register('ratedPowerEEC80_1269')}
+                error={errors.ratedPowerEEC80_1269?.message}
+                placeholder="21.2"
+              />
+              
+              <Input
+                label="7.4 No. of Cylinders"
+                type="number"
+                {...register('numberOfCylinders')}
+                error={errors.numberOfCylinders?.message}
+                placeholder="3"
+              />
+              
+              <Input
+                label="7.5 Bore × Stroke (mm)"
+                {...register('boreByStroke')}
+                error={errors.boreByStroke?.message}
+                placeholder="88 x 90"
+              />
+              
+              <Input
+                label="7.6 Piston Displacement (L)"
+                type="number"
+                step="0.001"
+                {...register('pistonDisplacement')}
+                error={errors.pistonDisplacement?.message}
+                placeholder="1.642"
+              />
+            </div>
+          </div>
+
+          {/* 8. Relief Valve Settings */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                {showExcavatorFields ? 'Excavator' : 'Loader'} Specifications
-              </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">8. Relief Valve Settings</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Input
-                  label="Bucket Capacity (m³)"
+                label="8.1 Implement Circuit (MPa)"
+                type="number"
+                step="0.1"
+                {...register('implementCircuit')}
+                error={errors.implementCircuit?.message}
+                placeholder="24.5"
+              />
+              
+              <Input
+                label="8.2 Swing Circuit (MPa)"
+                type="number"
+                step="0.1"
+                {...register('swingCircuit')}
+                error={errors.swingCircuit?.message}
+                placeholder="18.6"
+              />
+              
+              <Input
+                label="8.3 Travel Circuit (MPa)"
+                type="number"
+                step="0.1"
+                {...register('travelCircuit')}
+                error={errors.travelCircuit?.message}
+                placeholder="24.5"
+              />
+              
+              <Input
+                label="8.4 Max. Travel Speed High (km/h)"
                   type="number"
-                  step="0.01"
-                  {...register('bucketCapacity')}
-                  error={errors.bucketCapacity?.message}
-                  placeholder="0.91"
-                />
-                
-                {showExcavatorFields && (
-                  <>
+                step="0.1"
+                {...register('maxTravelSpeedHigh')}
+                error={errors.maxTravelSpeedHigh?.message}
+                placeholder="4.3"
+              />
+              
                     <Input
-                      label="Max Dig Depth (m)"
+                label="8.4 Max. Travel Speed Low (km/h)"
                       type="number"
-                      step="0.01"
-                      {...register('maxDigDepth')}
-                      error={errors.maxDigDepth?.message}
-                      placeholder="6.52"
+                step="0.1"
+                {...register('maxTravelSpeedLow')}
+                error={errors.maxTravelSpeedLow?.message}
+                placeholder="2.8"
                     />
                     
                     <Input
-                      label="Max Reach (m)"
+                label="8.5 Swing Speed (min⁻¹)"
                       type="number"
-                      step="0.01"
-                      {...register('maxReach')}
-                      error={errors.maxReach?.message}
-                      placeholder="9.9"
-                    />
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Transport Dimensions */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Transport Dimensions</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Input
-                label="Transport Length (m) *"
-                type="number"
-                step="0.01"
-                {...register('transportLength')}
-                error={errors.transportLength?.message}
-                placeholder="9.53"
+                step="0.1"
+                {...register('swingSpeed')}
+                error={errors.swingSpeed?.message}
+                placeholder="9.1"
               />
               
               <Input
-                label="Transport Width (m) *"
+                label="8.6 Standard Track Shoe Width (mm)"
                 type="number"
-                step="0.01"
-                {...register('transportWidth')}
-                error={errors.transportWidth?.message}
-                placeholder="2.55"
+                {...register('standardTrackShoeWidth')}
+                error={errors.standardTrackShoeWidth?.message}
+                placeholder="300"
               />
               
               <Input
-                label="Transport Height (m) *"
+                label="8.7 Undercarriage Length (mm)"
                 type="number"
-                step="0.01"
-                {...register('transportHeight')}
-                error={errors.transportHeight?.message}
-                placeholder="3.15"
+                {...register('undercarriageLength')}
+                error={errors.undercarriageLength?.message}
+                placeholder="2110"
+              />
+              
+              <Input
+                label="8.8 Undercarriage Width (mm)"
+                type="number"
+                {...register('undercarriageWidth')}
+                error={errors.undercarriageWidth?.message}
+                placeholder="1740"
               />
             </div>
           </div>
 
-          {/* Images */}
+          {/* 9. Capacity (Refilled) */}
           <div>
-            <FileUpload
-              label="Machinery Images"
-              accept="image/*"
-              multiple={true}
-              maxFiles={5}
-              onFilesChange={setImages}
-              value={images}
-              helpText="Upload up to 5 high-quality images of the machinery"
-            />
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">9. Capacity (Refilled)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="9.1 Fuel Tank (L) *"
+                type="number"
+                step="0.1"
+                {...register('fuelTankCapacity')}
+                error={errors.fuelTankCapacity?.message}
+                placeholder="42.0"
+              />
+              
+              <Input
+                label="9.2 Hydraulic System incl. oil tank (L)"
+                type="number"
+                step="0.1"
+                {...register('hydraulicSystemCapacity')}
+                error={errors.hydraulicSystemCapacity?.message}
+                placeholder="88.0"
+              />
+            </div>
           </div>
 
           {/* Form Actions */}
@@ -347,7 +483,7 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
               onClick={onCancel}
               disabled={isSubmitting || isLoading}
             >
-              Cancel
+              Cancelar
             </Button>
             <Button
               type="submit"
@@ -355,7 +491,7 @@ const MachineryForm: React.FC<MachineryFormProps> = ({
               loading={isSubmitting || isLoading}
             >
               <Save className="w-4 h-4 mr-2" />
-              {initialData ? 'Update Machinery' : 'Add Machinery'}
+              {initialData ? 'Actualizar Maquinaria' : 'Agregar Maquinaria'}
             </Button>
           </div>
         </form>

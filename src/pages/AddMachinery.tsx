@@ -16,19 +16,32 @@ interface MachineryFormData {
   manufacturer: string;
   price?: number;
   availability: 'available' | 'limited' | 'unavailable';
-  weight: number;
-  power: number;
-  maxOperatingWeight: number;
+  
+  // New specifications
+  regionOfferings?: string;
+  canopyVersionWeight?: number;
+  cabVersionWeight?: number;
   bucketCapacity?: number;
-  maxDigDepth?: number;
-  maxReach?: number;
-  transportLength: number;
-  transportWidth: number;
-  transportHeight: number;
+  emissionStandardEU?: string;
+  emissionStandardEPA?: string;
   engineModel: string;
-  fuelCapacity: number;
-  hydraulicSystem?: string;
-  description?: string;
+  ratedPowerISO9249: number;
+  ratedPowerSAEJ1349?: number;
+  ratedPowerEEC80_1269?: number;
+  numberOfCylinders?: number;
+  boreByStroke?: string;
+  pistonDisplacement?: number;
+  implementCircuit?: number;
+  swingCircuit?: number;
+  travelCircuit?: number;
+  maxTravelSpeedHigh?: number;
+  maxTravelSpeedLow?: number;
+  swingSpeed?: number;
+  standardTrackShoeWidth?: number;
+  undercarriageLength?: number;
+  undercarriageWidth?: number;
+  fuelTankCapacity: number;
+  hydraulicSystemCapacity?: number;
 }
 
 // Real API function that calls the backend
@@ -38,7 +51,7 @@ const addMachinery = async (data: MachineryFormData, _images: File[]): Promise<M
     'https://images.pexels.com/photos/1078884/pexels-photo-1078884.jpeg'
   ];
 
-  // Prepare the data for the backend
+  // Prepare the data for the backend with new specifications
   const machineryData = {
     name: data.name,
     model: data.model,
@@ -47,18 +60,30 @@ const addMachinery = async (data: MachineryFormData, _images: File[]): Promise<M
     manufacturer: data.manufacturer,
     images: defaultImages,
     specifications: {
-      weight: data.weight,
-      power: data.power,
-      maxOperatingWeight: data.maxOperatingWeight,
+      regionOfferings: data.regionOfferings ? data.regionOfferings.split(',').map(s => s.trim()) : [],
+      canopyVersionWeight: data.canopyVersionWeight,
+      cabVersionWeight: data.cabVersionWeight,
       bucketCapacity: data.bucketCapacity,
-      maxDigDepth: data.maxDigDepth,
-      maxReach: data.maxReach,
-      transportLength: data.transportLength,
-      transportWidth: data.transportWidth,
-      transportHeight: data.transportHeight,
+      emissionStandardEU: data.emissionStandardEU,
+      emissionStandardEPA: data.emissionStandardEPA,
       engineModel: data.engineModel,
-      fuelCapacity: data.fuelCapacity,
-      hydraulicSystem: data.hydraulicSystem,
+      ratedPowerISO9249: data.ratedPowerISO9249,
+      ratedPowerSAEJ1349: data.ratedPowerSAEJ1349,
+      ratedPowerEEC80_1269: data.ratedPowerEEC80_1269,
+      numberOfCylinders: data.numberOfCylinders,
+      boreByStroke: data.boreByStroke,
+      pistonDisplacement: data.pistonDisplacement,
+      implementCircuit: data.implementCircuit,
+      swingCircuit: data.swingCircuit,
+      travelCircuit: data.travelCircuit,
+      maxTravelSpeedHigh: data.maxTravelSpeedHigh,
+      maxTravelSpeedLow: data.maxTravelSpeedLow,
+      swingSpeed: data.swingSpeed,
+      standardTrackShoeWidth: data.standardTrackShoeWidth,
+      undercarriageLength: data.undercarriageLength,
+      undercarriageWidth: data.undercarriageWidth,
+      fuelTankCapacity: data.fuelTankCapacity,
+      hydraulicSystemCapacity: data.hydraulicSystemCapacity,
     },
     price: data.price,
     availability: data.availability,

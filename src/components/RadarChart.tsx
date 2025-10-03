@@ -26,10 +26,14 @@ const RadarChart: React.FC<RadarChartProps> = ({ machinery }) => {
   };
 
   const chartData: ChartData[] = machinery.map((machine, index) => {
+    const weight = machine.specifications.cabVersionWeight || machine.specifications.canopyVersionWeight || 0;
+    const power = machine.specifications.ratedPowerISO9249 || 0;
+    const fuel = machine.specifications.fuelTankCapacity || 0;
+    
     const values = [
-      normalizeValue(machine.specifications.weight, 50, 0), // Peso normalizado
-      normalizeValue(machine.specifications.power, 500, 0), // Potencia normalizada
-      normalizeValue(machine.specifications.fuelCapacity, 1000, 0), // Combustible normalizado
+      normalizeValue(weight, 10000, 0), // Peso normalizado (kg)
+      normalizeValue(power, 100, 0), // Potencia normalizada (kW)
+      normalizeValue(fuel, 200, 0), // Combustible normalizado (L)
       normalizeValue(machine.price || 0, 1000000, 0), // Precio normalizado
       normalizeValue(machine.rating * 20, 100, 0) // Calificación normalizada
     ];

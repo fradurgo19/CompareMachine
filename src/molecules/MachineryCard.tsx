@@ -1,123 +1,157 @@
 import React from 'react';
-import { Star, Eye, GitCompare as Compare } from 'lucide-react';
-import { Machinery } from '../types';
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 import Card from '../atoms/Card';
-import Button from '../atoms/Button';
 import Badge from '../atoms/Badge';
-import { useAppContext } from '../context/AppContext';
+import Button from '../atoms/Button';
+import { Machinery } from '../types';
 
 interface MachineryCardProps {
   machinery: Machinery;
-  onViewDetails: (machinery: Machinery) => void;
+  onSelect?: (machinery: Machinery) => void;
+  isSelected?: boolean;
 }
 
 const MachineryCard: React.FC<MachineryCardProps> = ({
   machinery,
-  onViewDetails
+  onSelect,
+  isSelected = false
 }) => {
-  const { selectedMachinery, setSelectedMachinery, comparisonMode } = useAppContext();
-  const isSelected = selectedMachinery.includes(machinery.id);
+  const navigate = useNavigate();
 
-  const handleToggleSelection = () => {
-    if (isSelected) {
-      setSelectedMachinery(selectedMachinery.filter(id => id !== machinery.id));
-    } else if (selectedMachinery.length < 5) {
-      setSelectedMachinery([...selectedMachinery, machinery.id]);
-    }
+  const handleViewDetails = () => {
+    navigate(`/machinery/${machinery.id}`);
   };
 
-  const handleQuickCompare = () => {
-    handleToggleSelection();
+  const getCategoryLabel = (category: string) => {
+    const labels: Record<string, string> = {
+      EXCAVATORS: 'Excavadora',
+      BULLDOZERS: 'Bulldozer',
+      LOADERS: 'Cargadora',
+      CRANES: 'Grúa',
+      DUMP_TRUCKS: 'Volquete',
+      COMPACTORS: 'Compactadora',
+      GRADERS: 'Niveladora',
+    };
+    return labels[category] || category;
   };
 
-  const getAvailabilityBadge = () => {
-    switch (machinery.availability) {
-      case 'available':
-        return <Badge variant="success">Disponible</Badge>;
-      case 'limited':
-        return <Badge variant="warning">Limitado</Badge>;
-      case 'unavailable':
-        return <Badge variant="error">No Disponible</Badge>;
-      default:
-        return null;
-    }
-  };
+  const specs = machinery.specifications;
 
   return (
-    <Card 
-      hover={true} 
-      padding="none"
-      className={`overflow-hidden transition-all duration-300 ${
-        comparisonMode && isSelected ? 'ring-2 ring-blue-500 shadow-lg' : ''
-      }`}
-    >
-      <div className="relative">
-        <img
-          src={machinery.images[0]}
-          alt={machinery.name}
-          className="w-full h-48 object-cover"
-          loading="lazy"
-        />
-        <div className="absolute top-3 left-3">
-          {getAvailabilityBadge()}
-        </div>
-        {machinery.price && (
-          <div className="absolute top-3 right-3 bg-white bg-opacity-90 rounded-md px-2 py-1">
-            <span className="text-sm font-semibold text-gray-900">
-              ${machinery.price.toLocaleString()}
-            </span>
-          </div>
-        )}
-      </div>
-
-      <div className="p-4">
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
-            {machinery.name}
-          </h3>
-          <div className="flex items-center text-sm text-gray-600 ml-2">
-            <Star className="w-4 h-4 text-yellow-400 fill-current mr-1" />
-            <span>{machinery.rating}</span>
+    <Card className={`transition-all ${isSelected ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:shadow-md'}`}>
+      <div className="p-6">
+        {/* Header */}
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex-1">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">{machinery.name}</h3>
+            <div className="flex items-center gap-2 mb-2">
+              <Badge variant="primary">{machinery.model}</Badge>
+              <Badge variant="secondary">{getCategoryLabel(machinery.category)}</Badge>
+            </div>
+            <p className="text-sm text-gray-600">
+              {machinery.manufacturer} • {machinery.series}
+            </p>
           </div>
         </div>
 
-        <p className="text-sm text-gray-600 mb-1">{machinery.manufacturer}</p>
-        <p className="text-xs text-gray-500 mb-3">
-          {machinery.model} • {machinery.series}
-        </p>
+        {/* Key Specifications */}
+        <div className="space-y-3 mb-4">
+          {/* Operating Weight */}
+          {(specs?.cabVersionWeight || specs?.canopyVersionWeight) && (
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              {specs.cabVersionWeight && (
+                <div>
+                  <span className="text-gray-500">Peso Cab:</span>
+                  <span className="ml-2 font-medium">{specs.cabVersionWeight.toFixed(0)} kg</span>
+                </div>
+              )}
+              {specs.canopyVersionWeight && (
+                <div>
+                  <span className="text-gray-500">Peso Canopy:</span>
+                  <span className="ml-2 font-medium">{specs.canopyVersionWeight.toFixed(0)} kg</span>
+                </div>
+              )}
+            </div>
+          )}
 
-        <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
-          <div>
-            <span className="text-gray-500">Peso:</span>
-            <span className="ml-1 font-medium">{machinery.specifications.weight}t</span>
+          {/* Engine & Power */}
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            <div>
+              <span className="text-gray-500">Motor:</span>
+              <span className="ml-2 font-medium">{specs?.engineModel || 'N/A'}</span>
+            </div>
+            <div>
+              <span className="text-gray-500">Potencia ISO:</span>
+              <span className="ml-2 font-medium">{specs?.ratedPowerISO9249 || 0} kW</span>
+            </div>
           </div>
-          <div>
-            <span className="text-gray-500">Potencia:</span>
-            <span className="ml-1 font-medium">{machinery.specifications.power}hp</span>
+
+          {/* Capacities */}
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            {specs?.bucketCapacity && (
+              <div>
+                <span className="text-gray-500">Balde:</span>
+                <span className="ml-2 font-medium">{specs.bucketCapacity} m³</span>
+              </div>
+            )}
+            <div>
+              <span className="text-gray-500">Combustible:</span>
+              <span className="ml-2 font-medium">{specs?.fuelTankCapacity || 0} L</span>
+            </div>
           </div>
+
+          {/* Emission Standards */}
+          {(specs?.emissionStandardEU || specs?.emissionStandardEPA) && (
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              {specs.emissionStandardEU && (
+                <div>
+                  <span className="text-gray-500">Emisión EU:</span>
+                  <span className="ml-2 font-medium">{specs.emissionStandardEU}</span>
+                </div>
+              )}
+              {specs.emissionStandardEPA && (
+                <div>
+                  <span className="text-gray-500">Emisión EPA:</span>
+                  <span className="ml-2 font-medium">{specs.emissionStandardEPA}</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
+        {/* Availability */}
+        <div className="mb-4">
+          <Badge
+            variant={
+              machinery.availability === 'AVAILABLE'
+                ? 'success'
+                : machinery.availability === 'LIMITED'
+                ? 'warning'
+                : 'danger'
+            }
+          >
+            {machinery.availability === 'AVAILABLE'
+              ? 'Disponible'
+              : machinery.availability === 'LIMITED'
+              ? 'Limitado'
+              : 'No Disponible'}
+          </Badge>
+        </div>
+
+        {/* Actions */}
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onViewDetails(machinery)}
-            className="flex-1"
-          >
-            <Eye className="w-4 h-4 mr-1" />
-            Detalles
-          </Button>
-          
-          <Button
-            variant={isSelected ? 'primary' : 'outline'}
-            size="sm"
-            onClick={handleQuickCompare}
-            disabled={!isSelected && selectedMachinery.length >= 5}
-            title={!isSelected && selectedMachinery.length >= 5 ? 'Máximo 5 máquinas para comparar' : ''}
-            className="flex-1"
-          >
-            <Compare className="w-4 h-4 mr-1" />
-            {isSelected ? 'Seleccionada' : 'Comparar'}
+          {onSelect && (
+            <Button
+              variant={isSelected ? 'primary' : 'outline'}
+              onClick={() => onSelect(machinery)}
+              className="flex-1"
+            >
+              {isSelected ? 'Seleccionada' : 'Seleccionar'}
+            </Button>
+          )}
+          <Button variant="ghost" onClick={handleViewDetails}>
+            <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
       </div>

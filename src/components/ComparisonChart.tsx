@@ -32,37 +32,37 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ machinery }) => {
     );
   }
 
-  // Normalizar datos para comparación
+  // Normalizar datos para comparación usando nuevos campos
   const comparisonData: ComparisonData[] = [
     {
-      label: 'Peso de Operación',
-      values: machinery.map(m => m.specifications.weight),
-      maxValue: Math.max(...machinery.map(m => m.specifications.weight)),
-      unit: 'toneladas'
+      label: 'Peso de Operación (Cab)',
+      values: machinery.map(m => m.specifications.cabVersionWeight || m.specifications.canopyVersionWeight || 0),
+      maxValue: Math.max(...machinery.map(m => m.specifications.cabVersionWeight || m.specifications.canopyVersionWeight || 0)),
+      unit: 'kg'
     },
     {
-      label: 'Potencia del Motor',
-      values: machinery.map(m => m.specifications.power),
-      maxValue: Math.max(...machinery.map(m => m.specifications.power)),
-      unit: 'HP'
+      label: 'Potencia ISO9249',
+      values: machinery.map(m => m.specifications.ratedPowerISO9249 || 0),
+      maxValue: Math.max(...machinery.map(m => m.specifications.ratedPowerISO9249 || 0)),
+      unit: 'kW'
     },
     {
       label: 'Capacidad de Combustible',
-      values: machinery.map(m => m.specifications.fuelCapacity),
-      maxValue: Math.max(...machinery.map(m => m.specifications.fuelCapacity)),
+      values: machinery.map(m => m.specifications.fuelTankCapacity || 0),
+      maxValue: Math.max(...machinery.map(m => m.specifications.fuelTankCapacity || 0)),
       unit: 'L'
+    },
+    {
+      label: 'Capacidad del Balde',
+      values: machinery.map(m => m.specifications.bucketCapacity || 0),
+      maxValue: Math.max(...machinery.map(m => m.specifications.bucketCapacity || 0)),
+      unit: 'm³'
     },
     {
       label: 'Precio',
       values: machinery.map(m => m.price || 0),
       maxValue: Math.max(...machinery.map(m => m.price || 0)),
       unit: 'USD'
-    },
-    {
-      label: 'Calificación',
-      values: machinery.map(m => m.rating * 20), // Escalar a 0-100
-      maxValue: 100,
-      unit: '/100'
     }
   ];
 
