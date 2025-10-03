@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ArrowLeft, Copy, FormInput } from 'lucide-react';
+import { Plus, ArrowLeft, Copy, FormInput, FileSpreadsheet } from 'lucide-react';
 import MachineryForm from '../molecules/MachineryForm';
 import TextSpecificationParser from '../components/TextSpecificationParser';
+import ExcelSpecificationParser from '../components/ExcelSpecificationParser';
 import Button from '../atoms/Button';
 import { Machinery } from '../types';
 import api from '../services/api';
@@ -108,13 +109,13 @@ const addMachinery = async (data: MachineryFormData, _images: File[]): Promise<M
   return response.data;
 };
 
-type TabType = 'manual' | 'paste';
+type TabType = 'manual' | 'paste' | 'excel';
 
 const AddMachinery: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabType>('paste');
+  const [activeTab, setActiveTab] = useState<TabType>('excel');
   const [parsedMachinery, setParsedMachinery] = useState<any[]>([]);
 
   const addMachineryMutation = useMutation({
@@ -243,7 +244,7 @@ const AddMachinery: React.FC = () => {
                 Agregar Nueva Maquinaria
               </h1>
               <p className="text-gray-600 mt-1">
-                Copia y pega especificaciones o ingrésalas manualmente
+                Sube Excel, copia y pega, o ingresa manualmente las especificaciones
               </p>
             </div>
           </div>
@@ -253,6 +254,19 @@ const AddMachinery: React.FC = () => {
         <div className="mb-6">
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8">
+              <button
+                onClick={() => setActiveTab('excel')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'excel'
+                    ? 'border-green-500 text-green-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-center">
+                  <FileSpreadsheet className="w-5 h-5 mr-2" />
+                  Excel Upload
+                </div>
+              </button>
               <button
                 onClick={() => setActiveTab('paste')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
@@ -284,7 +298,20 @@ const AddMachinery: React.FC = () => {
         </div>
 
         {/* Content */}
-        {activeTab === 'paste' ? (
+        {activeTab === 'excel' ? (
+          <div>
+            <ExcelSpecificationParser onParsed={handleParsed} />
+            
+            {parsedMachinery.length > 0 && (
+              <div className="mt-6 flex justify-end">
+                <Button onClick={handleAddParsedMachinery} size="lg">
+                  <Plus className="w-5 h-5 mr-2" />
+                  Agregar {parsedMachinery.length} Máquina(s)
+                </Button>
+              </div>
+            )}
+          </div>
+        ) : activeTab === 'paste' ? (
           <div>
             <TextSpecificationParser onParsed={handleParsed} />
             

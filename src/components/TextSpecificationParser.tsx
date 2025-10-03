@@ -87,12 +87,25 @@ const TextSpecificationParser: React.FC<TextSpecificationParserProps> = ({ onPar
 
   const exampleText = `ZX-5A Mini Excavator Series Specifications
 Model ZX38U-5A ZX48U-5A ZX55U-5A
+Region Offerings
+SE Asia, Oceania SE Asia, Oceania SE Asia, Oceania
 Operating Weight Range ;
 Cab version kg 3 940 - 4 170 4 860 - 5 060 5 170 - 5 370
 Bucket Capacity Range m3 0.10 0.11 0.14
+Emission Standard; EU Stage III A Stage III A Stage III A
+EPA Interim Tire4 Interim Tire4 Interim Tire4
 Engine Model Yanmar EDM-3TNV88 EDM-4TNV88 4TNV94L-ZWHB
-Rated Power ISO9249,net kW 21.2 28.2 34.1
-Fuel Tank L 42.0 70.0 120.0`;
+Rated Power ;
+ISO9249,net kW 21.2 28.2 34.1
+No. of Cylinders 3 4 4
+Bore × Stroke mm 88 x 90 88 x 90 94 x 110
+Piston Displacement L 1.642 2.189 3.053
+Implement Circuit MPa 24.5 24.5 24.5
+Max. Travel Speed Hi / Low km/h 4.3 / 2.8 4.2 / 2.5 4.8 / 2.9
+Swing Speed min-1 9.1 9.0 9.5
+Undercarriage Length mm 2 110 2 500 2 500
+Fuel Tank L 42.0 70.0 120.0
+Hydraulic System L 88.0 108.0 168.0`;
 
   return (
     <div className="space-y-6">
@@ -116,7 +129,19 @@ Fuel Tank L 42.0 70.0 120.0`;
                   <li>Primera línea: Título con el nombre de la serie (ej: "ZX-5A Mini Excavator Series")</li>
                   <li>Segunda línea: "Model" seguido de los nombres de los modelos</li>
                   <li>Líneas siguientes: Campos con valores para cada modelo</li>
-                  <li>Separación: Espacios múltiples o tabulaciones entre columnas</li>
+                  <li>Separación: Espacios múltiples, tabulaciones, o comas (CSV)</li>
+                  <li>Soporta rangos (ej: 3940-4170) y valores con espacios (ej: 3 940)</li>
+                </ul>
+              </div>
+              
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                <h4 className="font-semibold text-green-900 mb-2">✨ Formatos Soportados:</h4>
+                <ul className="text-sm text-green-800 space-y-1 list-disc list-inside">
+                  <li>📄 Copiar desde PDF (texto nativo)</li>
+                  <li>📊 Copiar desde Excel (Ctrl+C)</li>
+                  <li>📝 Copiar desde Word</li>
+                  <li>🌐 Copiar desde páginas web</li>
+                  <li>💾 Pegar CSV (separado por comas)</li>
                 </ul>
               </div>
 

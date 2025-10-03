@@ -294,6 +294,44 @@ class ApiService {
       body: JSON.stringify({ text }),
     });
   }
+
+  // Excel parser endpoints
+  async parseExcelSpecifications(file: File): Promise<ApiResponse<any[]>> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const url = `${this.baseURL}/excel-parser/specifications`;
+    const token = localStorage.getItem('authToken');
+
+    const headers: HeadersInit = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Error al procesar el archivo Excel');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Excel parsing API request failed:', error);
+      throw error;
+    }
+  }
+
+  async downloadExcelTemplate(): Promise<void> {
+    const url = `${this.baseURL}/excel-parser/template`;
+    window.open(url, '_blank');
+  }
 }
 
 export const apiService = new ApiService();

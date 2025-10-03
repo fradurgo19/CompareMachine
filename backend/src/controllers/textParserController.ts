@@ -68,7 +68,18 @@ export const parseTextSpecifications = async (req: Request, res: Response) => {
       });
     }
 
-    const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    // Pre-process text: handle different formats
+    let processedText = text;
+    
+    // Convert CSV format to tab-separated
+    if (text.includes(',') && !text.includes('\t') && text.split(',').length > text.split(/\s{2,}/).length) {
+      processedText = text.replace(/,/g, '\t');
+    }
+    
+    // Normalize line breaks
+    processedText = processedText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    
+    const lines = processedText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
 
     if (lines.length < 3) {
       return res.status(400).json({
@@ -87,25 +98,36 @@ export const parseTextSpecifications = async (req: Request, res: Response) => {
     if (seriesMatch) {
       series = seriesMatch[1];
       
-      // Infer manufacturer from model prefix
+      // Infer manufacturer from model prefix or series
       if (series.startsWith('ZX')) manufacturer = 'Hitachi';
-      else if (series.startsWith('CAT') || series.startsWith('320')) manufacturer = 'Caterpillar';
+      else if (series.startsWith('CAT') || series.startsWith('320') || series.startsWith('330')) manufacturer = 'Caterpillar';
       else if (series.startsWith('PC')) manufacturer = 'Komatsu';
       else if (series.startsWith('EC')) manufacturer = 'Volvo';
       else if (series.startsWith('JCB')) manufacturer = 'JCB';
+      else if (series.startsWith('850') || series.startsWith('750')) manufacturer = 'John Deere';
     }
 
-    // Find the line with models
+    // Find the line with models (more flexible matching)
     let modelLineIndex = -1;
     let models: string[] = [];
 
     for (let i = 0; i < lines.length; i++) {
-      if (lines[i].toLowerCase().startsWith('model')) {
+      const line = lines[i].toLowerCase();
+      if (line.startsWith('model') || line.includes('model\t') || line === 'model') {
         modelLineIndex = i;
-        // Extract models from the line
+        // Extract models from the line - try multiple separators
         const modelLine = lines[i];
-        const parts = modelLine.split(/\s{2,}|\t/).filter(p => p.trim().length > 0);
-        models = parts.slice(1); // Skip the "Model" label
+        let parts: string[];
+        
+        // Try tab separator first
+        if (modelLine.includes('\t')) {
+          parts = modelLine.split('\t').filter(p => p.trim().length > 0);
+        } else {
+          // Fall back to multiple spaces
+          parts = modelLine.split(/\s{2,}/).filter(p => p.trim().length > 0);
+        }
+        
+        models = parts.slice(1).map(m => m.trim()); // Skip the "Model" label
         break;
       }
     }
@@ -149,8 +171,13 @@ export const parseTextSpecifications = async (req: Request, res: Response) => {
         continue;
       }
 
-      // Split line into parts
-      const parts = line.split(/\s{2,}|\t/).filter(p => p.trim().length > 0);
+      // Split line into parts - try tab first, then multiple spaces
+      let parts: string[];
+      if (line.includes('\t')) {
+        parts = line.split('\t').filter(p => p.trim().length > 0);
+      } else {
+        parts = line.split(/\s{2,}/).filter(p => p.trim().length > 0);
+      }
       
       if (parts.length < 2) continue;
 

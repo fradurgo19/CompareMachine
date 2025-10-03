@@ -22,7 +22,13 @@
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix"
   },
-  "keywords": ["machinery", "comparison", "api", "backend", "typescript"],
+  "keywords": [
+    "machinery",
+    "comparison",
+    "api",
+    "backend",
+    "typescript"
+  ],
   "author": "Frank Duran",
   "license": "MIT",
   "type": "commonjs",
@@ -41,6 +47,7 @@
     "multer": "^2.0.2",
     "prisma": "^6.16.2",
     "swagger-ui-express": "^5.0.1",
+    "xlsx": "^0.18.5",
     "zod": "^4.1.9"
   },
   "devDependencies": {
