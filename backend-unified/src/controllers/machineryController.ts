@@ -142,8 +142,30 @@ export const createMachinery = async (req: Request, res: Response) => {
   try {
     const data = createMachinerySchema.parse(req.body);
 
-    const machinery = await prisma.machinery.create({
-      data: {
+    // Use upsert to update if exists, create if not
+    const machinery = await prisma.machinery.upsert({
+      where: {
+        name_model: {
+          name: data.name,
+          model: data.model
+        }
+      },
+      update: {
+        series: data.series,
+        category: data.category,
+        manufacturer: data.manufacturer,
+        images: data.images,
+        price: data.price,
+        availability: data.availability,
+        rating: data.rating,
+        specifications: {
+          upsert: {
+            create: data.specifications,
+            update: data.specifications
+          }
+        }
+      },
+      create: {
         ...data,
         specifications: {
           create: data.specifications
@@ -157,10 +179,12 @@ export const createMachinery = async (req: Request, res: Response) => {
     const response: ApiResponse<typeof machinery> = {
       success: true,
       data: machinery,
-      message: 'Machinery created successfully'
+      message: machinery.createdAt.getTime() === machinery.updatedAt.getTime() 
+        ? 'Machinery created successfully' 
+        : 'Machinery updated successfully'
     };
 
-    res.status(201).json(response);
+    res.status(machinery.createdAt.getTime() === machinery.updatedAt.getTime() ? 201 : 200).json(response);
   } catch (error) {
     console.error('Error creating machinery:', error);
     res.status(500).json({
