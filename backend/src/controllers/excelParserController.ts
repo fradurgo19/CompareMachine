@@ -242,14 +242,19 @@ export const generateExcelTemplate = async (req: Request, res: Response) => {
     // Add worksheet to workbook
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Machinery Template');
     
-    // Generate buffer
-    const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    // Generate buffer with proper options
+    const excelBuffer = XLSX.write(workbook, { 
+      type: 'buffer', 
+      bookType: 'xlsx',
+      compression: true
+    });
     
     // Set headers for download
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename=machinery-template.xlsx');
+    res.setHeader('Content-Disposition', 'attachment; filename="machinery-template.xlsx"');
+    res.setHeader('Content-Length', excelBuffer.length.toString());
     
-    res.send(excelBuffer);
+    return res.end(excelBuffer, 'binary');
   } catch (error: any) {
     console.error('Error generating Excel template:', error);
     
