@@ -13,17 +13,20 @@ export const getMachinery = async (req: Request, res: Response) => {
     // Build where clause
     const where: any = {};
 
-    if (category) {
+    // Only filter by category if it's not 'all'
+    if (category && category !== 'all') {
       where.category = category;
     }
 
-    if (manufacturer) {
+    // Only filter by manufacturer if it's not empty
+    if (manufacturer && manufacturer.trim() !== '') {
       where.manufacturer = {
         contains: manufacturer,
         mode: 'insensitive'
       };
     }
 
+    // Only filter by availability if it's provided
     if (availability) {
       where.availability = availability;
     }
@@ -41,6 +44,9 @@ export const getMachinery = async (req: Request, res: Response) => {
         { manufacturer: { contains: search, mode: 'insensitive' } }
       ];
     }
+
+    console.log('🔍 WHERE CLAUSE:', JSON.stringify(where, null, 2));
+    console.log('🔍 PAGINATION:', { skip, limit, page });
 
     // Build orderBy clause
     let orderBy: any = { createdAt: 'desc' };
@@ -66,6 +72,8 @@ export const getMachinery = async (req: Request, res: Response) => {
       }),
       prisma.machinery.count({ where })
     ]);
+
+    console.log('🔍 PRISMA RESULTS:', { totalCount: total, machineryFetched: machinery.length, allNames: machinery.map(m => m.name) });
 
     console.log('🔍 Backend Debug - Before filtering:', {
       totalFromDB: total,
