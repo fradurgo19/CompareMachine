@@ -2,21 +2,26 @@ import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Machinery } from '../types';
 import MachineryGrid from '../organisms/MachineryGrid';
+import MachineryForm from '../molecules/MachineryForm';
 import ComparisonChart from '../components/ComparisonChart';
 import ComparisonInstructions from '../components/ComparisonInstructions';
-import { X, Download, Star, Wrench, Plus, BarChart3 } from 'lucide-react';
+import { X, Download, Star, Wrench, Plus, BarChart3, Edit2, Trash2 } from 'lucide-react';
 import Button from '../atoms/Button';
 import Card from '../atoms/Card';
 import Badge from '../atoms/Badge';
 import { useAppContext } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
 
 const MachineryComparison: React.FC = () => {
   const [selectedMachinery, setSelectedMachinery] = useState<Machinery | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
   const { comparisonMode, selectedMachinery: selectedIds, toggleComparisonMode, clearSelection } = useAppContext();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const queryClient = useQueryClient();
+  
+  const isAdmin = user?.role === 'ADMIN';
 
   const handleViewDetails = (machinery: Machinery) => {
     setSelectedMachinery(machinery);
@@ -24,11 +29,99 @@ const MachineryComparison: React.FC = () => {
 
   const handleCloseModal = () => {
     setSelectedMachinery(null);
+    setIsEditMode(false);
   };
 
   const handleDownloadReport = () => {
     // In a real application, this would generate and download a PDF report
     console.log('Downloading comparison report...');
+  };
+
+  const handleEdit = () => {
+    setIsEditMode(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+  };
+
+  const deleteMachineryMutation = useMutation({
+    mutationFn: (id: string) => api.deleteMachinery(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['machinery'] });
+      setSelectedMachinery(null);
+      alert('Maquinaria eliminada exitosamente');
+    },
+    onError: (error) => {
+      console.error('Error deleting machinery:', error);
+      alert('Error al eliminar la maquinaria. Por favor, inténtalo de nuevo.');
+    },
+  });
+
+  const handleDelete = async () => {
+    if (!selectedMachinery) return;
+    
+    const confirmDelete = window.confirm(
+      `¿Estás seguro de que quieres eliminar "${selectedMachinery.name}"?\n\nEsta acción no se puede deshacer.`
+    );
+    
+    if (confirmDelete) {
+      deleteMachineryMutation.mutate(selectedMachinery.id);
+    }
+  };
+
+  const handleUpdateSubmit = async (data: any, _images: File[]) => {
+    if (!selectedMachinery) return;
+
+    try {
+      const updateData = {
+        name: data.name || `${data.manufacturer || 'Unknown'} ${data.model || 'Unknown'} Excavator`,
+        model: data.model || selectedMachinery.model,
+        series: data.series || selectedMachinery.series,
+        category: data.category || selectedMachinery.category,
+        manufacturer: data.manufacturer || selectedMachinery.manufacturer,
+        specifications: {
+          regionOfferings: data.regionOfferings ? data.regionOfferings.split(',').map((s: string) => s.trim()) : [],
+          canopyVersionWeight: data.canopyVersionWeight,
+          cabVersionWeight: data.cabVersionWeight,
+          bucketCapacity: data.bucketCapacity,
+          emissionStandardEU: data.emissionStandardEU,
+          emissionStandardEPA: data.emissionStandardEPA,
+          engineModel: data.engineModel || 'Unknown',
+          ratedPowerISO9249: data.ratedPowerISO9249 || 0,
+          ratedPowerSAEJ1349: data.ratedPowerSAEJ1349,
+          ratedPowerEEC80_1269: data.ratedPowerEEC80_1269,
+          numberOfCylinders: data.numberOfCylinders,
+          boreByStroke: data.boreByStroke,
+          pistonDisplacement: data.pistonDisplacement,
+          implementCircuit: data.implementCircuit,
+          swingCircuit: data.swingCircuit,
+          travelCircuit: data.travelCircuit,
+          maxTravelSpeedHigh: data.maxTravelSpeedHigh,
+          maxTravelSpeedLow: data.maxTravelSpeedLow,
+          swingSpeed: data.swingSpeed,
+          standardTrackShoeWidth: data.standardTrackShoeWidth,
+          undercarriageLength: data.undercarriageLength,
+          undercarriageWidth: data.undercarriageWidth,
+          fuelTankCapacity: data.fuelTankCapacity || 0,
+          hydraulicSystemCapacity: data.hydraulicSystemCapacity,
+        },
+        price: data.price,
+        availability: data.availability || 'AVAILABLE',
+      };
+
+      const response = await api.updateMachinery(selectedMachinery.id, updateData);
+      
+      if (response.success) {
+        queryClient.invalidateQueries({ queryKey: ['machinery'] });
+        setIsEditMode(false);
+        setSelectedMachinery(response.data);
+        alert('Maquinaria actualizada exitosamente');
+      }
+    } catch (error) {
+      console.error('Error updating machinery:', error);
+      alert('Error al actualizar la maquinaria. Por favor, inténtalo de nuevo.');
+    }
   };
 
   const handleClearSelection = () => {
@@ -207,17 +300,35 @@ const MachineryComparison: React.FC = () => {
               <div className="flex items-center justify-between p-6 border-b border-gray-200">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">
-                    {selectedMachinery.name}
+                    {isEditMode ? 'Editar Maquinaria' : selectedMachinery.name}
                   </h2>
                   <p className="text-gray-600">
                     {selectedMachinery.manufacturer} • {selectedMachinery.model}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Button variant="outline" onClick={handleDownloadReport}>
-                    <Download className="w-4 h-4 mr-2" />
-                    Descargar Reporte
-                  </Button>
+                  {!isEditMode && isAdmin && (
+                    <>
+                      <Button variant="outline" onClick={handleEdit}>
+                        <Edit2 className="w-4 h-4 mr-2" />
+                        Editar
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={handleDelete}
+                        className="border-red-300 text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Eliminar
+                      </Button>
+                    </>
+                  )}
+                  {!isEditMode && (
+                    <Button variant="outline" onClick={handleDownloadReport}>
+                      <Download className="w-4 h-4 mr-2" />
+                      Descargar
+                    </Button>
+                  )}
                   <Button variant="ghost" onClick={handleCloseModal}>
                     <X className="w-5 h-5" />
                   </Button>
@@ -226,8 +337,44 @@ const MachineryComparison: React.FC = () => {
 
               {/* Modal Content */}
               <div className="p-6">
-                {/* Detailed Specifications */}
-                <Card>
+                {isEditMode ? (
+                  /* Edit Mode - Show Form */
+                  <MachineryForm
+                    onSubmit={handleUpdateSubmit}
+                    onCancel={handleCancelEdit}
+                    initialData={{
+                      model: selectedMachinery.model,
+                      category: selectedMachinery.category as any,
+                      manufacturer: selectedMachinery.manufacturer,
+                      regionOfferings: selectedMachinery.specifications.regionOfferings?.join(', '),
+                      canopyVersionWeight: selectedMachinery.specifications.canopyVersionWeight,
+                      cabVersionWeight: selectedMachinery.specifications.cabVersionWeight,
+                      bucketCapacity: selectedMachinery.specifications.bucketCapacity,
+                      emissionStandardEU: selectedMachinery.specifications.emissionStandardEU,
+                      emissionStandardEPA: selectedMachinery.specifications.emissionStandardEPA,
+                      engineModel: selectedMachinery.specifications.engineModel,
+                      ratedPowerISO9249: selectedMachinery.specifications.ratedPowerISO9249,
+                      ratedPowerSAEJ1349: selectedMachinery.specifications.ratedPowerSAEJ1349,
+                      ratedPowerEEC80_1269: selectedMachinery.specifications.ratedPowerEEC80_1269,
+                      numberOfCylinders: selectedMachinery.specifications.numberOfCylinders,
+                      boreByStroke: selectedMachinery.specifications.boreByStroke,
+                      pistonDisplacement: selectedMachinery.specifications.pistonDisplacement,
+                      implementCircuit: selectedMachinery.specifications.implementCircuit,
+                      swingCircuit: selectedMachinery.specifications.swingCircuit,
+                      travelCircuit: selectedMachinery.specifications.travelCircuit,
+                      maxTravelSpeedHigh: selectedMachinery.specifications.maxTravelSpeedHigh,
+                      maxTravelSpeedLow: selectedMachinery.specifications.maxTravelSpeedLow,
+                      swingSpeed: selectedMachinery.specifications.swingSpeed,
+                      standardTrackShoeWidth: selectedMachinery.specifications.standardTrackShoeWidth,
+                      undercarriageLength: selectedMachinery.specifications.undercarriageLength,
+                      undercarriageWidth: selectedMachinery.specifications.undercarriageWidth,
+                      fuelTankCapacity: selectedMachinery.specifications.fuelTankCapacity,
+                      hydraulicSystemCapacity: selectedMachinery.specifications.hydraulicSystemCapacity,
+                    }}
+                  />
+                ) : (
+                  /* View Mode - Show Specifications */
+                  <Card>
                   <h3 className="text-xl font-semibold mb-6 flex items-center">
                     <Wrench className="w-5 h-5 mr-2" />
                     Especificaciones Técnicas Completas
@@ -457,6 +604,7 @@ const MachineryComparison: React.FC = () => {
                     </div>
                   </div>
                 </Card>
+                )}
               </div>
             </div>
           </div>
