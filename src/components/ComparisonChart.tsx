@@ -32,39 +32,157 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ machinery }) => {
     );
   }
 
-  // Normalizar datos para comparación usando nuevos campos
-  const comparisonData: ComparisonData[] = [
-    {
-      label: 'Peso de Operación (Cab)',
-      values: machinery.map(m => m.specifications.cabVersionWeight || m.specifications.canopyVersionWeight || 0),
-      maxValue: Math.max(...machinery.map(m => m.specifications.cabVersionWeight || m.specifications.canopyVersionWeight || 0)),
-      unit: 'kg'
-    },
-    {
-      label: 'Potencia ISO9249',
-      values: machinery.map(m => m.specifications.ratedPowerISO9249 || 0),
-      maxValue: Math.max(...machinery.map(m => m.specifications.ratedPowerISO9249 || 0)),
-      unit: 'kW'
-    },
-    {
-      label: 'Capacidad de Combustible',
-      values: machinery.map(m => m.specifications.fuelTankCapacity || 0),
-      maxValue: Math.max(...machinery.map(m => m.specifications.fuelTankCapacity || 0)),
-      unit: 'L'
-    },
-    {
-      label: 'Capacidad del Balde',
-      values: machinery.map(m => m.specifications.bucketCapacity || 0),
-      maxValue: Math.max(...machinery.map(m => m.specifications.bucketCapacity || 0)),
-      unit: 'm³'
-    },
-    {
-      label: 'Precio',
-      values: machinery.map(m => m.price || 0),
-      maxValue: Math.max(...machinery.map(m => m.price || 0)),
-      unit: 'USD'
+  // Crear datos de comparación dinámicamente basados en campos disponibles
+  const buildComparisonData = (): ComparisonData[] => {
+    const data: ComparisonData[] = [];
+
+    // 3. Operating Weight Range (Cab Version)
+    const cabWeights = machinery.map(m => m.specifications.cabVersionWeight || 0);
+    if (cabWeights.some(w => w > 0)) {
+      data.push({
+        label: '3.2 Peso Cab Version (kg)',
+        values: cabWeights,
+        maxValue: Math.max(...cabWeights),
+        unit: 'kg'
+      });
     }
-  ];
+
+    // 3.1 Operating Weight Range (Canopy Version)
+    const canopyWeights = machinery.map(m => m.specifications.canopyVersionWeight || 0);
+    if (canopyWeights.some(w => w > 0)) {
+      data.push({
+        label: '3.1 Peso Canopy Version (kg)',
+        values: canopyWeights,
+        maxValue: Math.max(...canopyWeights),
+        unit: 'kg'
+      });
+    }
+
+    // 4. Bucket Capacity
+    const bucketCapacities = machinery.map(m => m.specifications.bucketCapacity || 0);
+    if (bucketCapacities.some(b => b > 0)) {
+      data.push({
+        label: '4. Bucket Capacity (m³)',
+        values: bucketCapacities,
+        maxValue: Math.max(...bucketCapacities),
+        unit: 'm³'
+      });
+    }
+
+    // 7.1 Rated Power ISO9249
+    const powerISO = machinery.map(m => m.specifications.ratedPowerISO9249 || 0);
+    if (powerISO.some(p => p > 0)) {
+      data.push({
+        label: '7.1 Potencia ISO9249 (kW)',
+        values: powerISO,
+        maxValue: Math.max(...powerISO),
+        unit: 'kW'
+      });
+    }
+
+    // 7.4 Number of Cylinders
+    const cylinders = machinery.map(m => m.specifications.numberOfCylinders || 0);
+    if (cylinders.some(c => c > 0)) {
+      data.push({
+        label: '7.4 No. de Cilindros',
+        values: cylinders,
+        maxValue: Math.max(...cylinders),
+        unit: ''
+      });
+    }
+
+    // 7.6 Piston Displacement
+    const displacement = machinery.map(m => m.specifications.pistonDisplacement || 0);
+    if (displacement.some(d => d > 0)) {
+      data.push({
+        label: '7.6 Desplazamiento Pistón (L)',
+        values: displacement,
+        maxValue: Math.max(...displacement),
+        unit: 'L'
+      });
+    }
+
+    // 8.1 Implement Circuit
+    const implementCircuit = machinery.map(m => m.specifications.implementCircuit || 0);
+    if (implementCircuit.some(i => i > 0)) {
+      data.push({
+        label: '8.1 Circuito Implementación (MPa)',
+        values: implementCircuit,
+        maxValue: Math.max(...implementCircuit),
+        unit: 'MPa'
+      });
+    }
+
+    // 8.4 Max Travel Speed High
+    const travelSpeedHigh = machinery.map(m => m.specifications.maxTravelSpeedHigh || 0);
+    if (travelSpeedHigh.some(s => s > 0)) {
+      data.push({
+        label: '8.4 Vel. Desplaz. Alta (km/h)',
+        values: travelSpeedHigh,
+        maxValue: Math.max(...travelSpeedHigh),
+        unit: 'km/h'
+      });
+    }
+
+    // 8.5 Swing Speed
+    const swingSpeed = machinery.map(m => m.specifications.swingSpeed || 0);
+    if (swingSpeed.some(s => s > 0)) {
+      data.push({
+        label: '8.5 Vel. Giro (min⁻¹)',
+        values: swingSpeed,
+        maxValue: Math.max(...swingSpeed),
+        unit: 'min⁻¹'
+      });
+    }
+
+    // 8.7 Undercarriage Length
+    const undercarriageLength = machinery.map(m => m.specifications.undercarriageLength || 0);
+    if (undercarriageLength.some(l => l > 0)) {
+      data.push({
+        label: '8.7 Longitud Tren Rodaje (mm)',
+        values: undercarriageLength,
+        maxValue: Math.max(...undercarriageLength),
+        unit: 'mm'
+      });
+    }
+
+    // 8.6 Standard Track Shoe Width
+    const trackWidth = machinery.map(m => m.specifications.standardTrackShoeWidth || 0);
+    if (trackWidth.some(w => w > 0)) {
+      data.push({
+        label: '8.6 Ancho Zapata (mm)',
+        values: trackWidth,
+        maxValue: Math.max(...trackWidth),
+        unit: 'mm'
+      });
+    }
+
+    // 9.2 Fuel Tank
+    const fuelTank = machinery.map(m => m.specifications.fuelTankCapacity || 0);
+    if (fuelTank.some(f => f > 0)) {
+      data.push({
+        label: '9.2 Tanque Combustible (L)',
+        values: fuelTank,
+        maxValue: Math.max(...fuelTank),
+        unit: 'L'
+      });
+    }
+
+    // 9.3 Hydraulic System
+    const hydraulicSystem = machinery.map(m => m.specifications.hydraulicSystemCapacity || 0);
+    if (hydraulicSystem.some(h => h > 0)) {
+      data.push({
+        label: '9.3 Sistema Hidráulico (L)',
+        values: hydraulicSystem,
+        maxValue: Math.max(...hydraulicSystem),
+        unit: 'L'
+      });
+    }
+
+    return data;
+  };
+
+  const comparisonData = buildComparisonData();
 
   // Colores para cada máquina
   const colors = [
@@ -101,7 +219,7 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ machinery }) => {
 
       {/* Resumen de Comparación */}
       <Card>
-        <h3 className="text-xl font-semibold mb-4">Resumen de Comparación</h3>
+        <h3 className="text-xl font-semibold mb-4">Resumen de Máquinas</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {machinery.map((machine, index) => (
             <div key={machine.id} className="border rounded-lg p-4">
@@ -111,25 +229,24 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ machinery }) => {
               </div>
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between">
+                  <span>1. Modelo:</span>
+                  <span className="font-medium">{machine.model}</span>
+                </div>
+                <div className="flex justify-between">
                   <span>Fabricante:</span>
                   <span className="font-medium">{machine.manufacturer}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Modelo:</span>
-                  <span className="font-medium">{machine.model}</span>
+                  <span>6. Motor:</span>
+                  <span className="font-medium">{machine.specifications.engineModel}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Precio:</span>
-                  <span className="font-medium">
-                    {machine.price ? `$${machine.price.toLocaleString()}` : 'N/A'}
-                  </span>
+                  <span>7.1 Potencia:</span>
+                  <span className="font-medium">{machine.specifications.ratedPowerISO9249} kW</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span>Calificación:</span>
-                  <div className="flex items-center">
-                    <Star className="w-3 h-3 text-yellow-400 fill-current mr-1" />
-                    <span className="font-medium">{machine.rating.toFixed(1)}</span>
-                  </div>
+                <div className="flex justify-between">
+                  <span>9.2 Combustible:</span>
+                  <span className="font-medium">{machine.specifications.fuelTankCapacity} L</span>
                 </div>
               </div>
             </div>
@@ -140,8 +257,19 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ machinery }) => {
       {/* Gráfico de Barras Comparativo */}
       <Card>
         <h3 className="text-xl font-semibold mb-6">Comparación de Especificaciones</h3>
-        <div className="space-y-6">
-          {comparisonData.map((data, dataIndex) => (
+        {comparisonData.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">
+              No hay especificaciones completas para comparar. 
+              Las máquinas seleccionadas usan el formato antiguo de especificaciones.
+            </p>
+            <p className="text-sm text-gray-400 mt-2">
+              Agrega nuevas máquinas usando "Copiar y Pegar" para ver comparaciones detalladas.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {comparisonData.map((data, dataIndex) => (
             <div key={dataIndex} className="space-y-3">
               <div className="flex items-center justify-between">
                 <h4 className="font-medium text-gray-900">{data.label}</h4>
@@ -182,8 +310,9 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ machinery }) => {
                 })}
               </div>
             </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </Card>
 
       {/* Análisis de Fortalezas y Debilidades */}
