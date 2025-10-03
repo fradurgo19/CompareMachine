@@ -73,10 +73,21 @@ export const getMachinery = async (req: Request, res: Response) => {
       filteredMachinery = machinery.filter((m: any) => {
         if (!m.specifications) return false;
         
-        if (weightMin && m.specifications.weight < weightMin) return false;
-        if (weightMax && m.specifications.weight > weightMax) return false;
-        if (powerMin && m.specifications.power < powerMin) return false;
-        if (powerMax && m.specifications.power > powerMax) return false;
+        // Get weight from new fields (canopyVersionWeight/cabVersionWeight) or old field (weight)
+        const weight = m.specifications.cabVersionWeight || 
+                      m.specifications.canopyVersionWeight || 
+                      m.specifications.weight || 
+                      0;
+        
+        // Get power from new field (ratedPowerISO9249) or old field (power)
+        const power = m.specifications.ratedPowerISO9249 || 
+                     m.specifications.power || 
+                     0;
+        
+        if (weightMin && weight < weightMin) return false;
+        if (weightMax && weight > weightMax) return false;
+        if (powerMin && power < powerMin) return false;
+        if (powerMax && power > powerMax) return false;
         
         return true;
       });
