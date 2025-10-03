@@ -42,76 +42,62 @@ const MachineryCard: React.FC<MachineryCardProps> = ({
   return (
     <Card 
       hover={true} 
-      padding="none"
-      className={`overflow-hidden transition-all duration-300 ${
+      padding="default"
+      className={`transition-all duration-300 ${
         comparisonMode && isSelected ? 'ring-2 ring-blue-500 shadow-lg' : ''
       }`}
     >
-      <div className="relative">
-        <img
-          src={machinery.images[0]}
-          alt={machinery.name}
-          className="w-full h-48 object-cover"
-          loading="lazy"
-        />
-        <div className="absolute top-3 left-3">
-          {getAvailabilityBadge()}
-        </div>
-        {machinery.price && (
-          <div className="absolute top-3 right-3 bg-white bg-opacity-90 rounded-md px-2 py-1">
-            <span className="text-sm font-semibold text-gray-900">
-              ${machinery.price.toLocaleString()}
-            </span>
+      <div className="space-y-4">
+        {/* Header */}
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              {machinery.name}
+            </h3>
+            <p className="text-sm text-gray-600">{machinery.manufacturer}</p>
+            <p className="text-xs text-gray-500">
+              {machinery.model} • {machinery.series}
+            </p>
           </div>
-        )}
-      </div>
-
-      <div className="p-4">
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
-            {machinery.name}
-          </h3>
-          <div className="flex items-center text-sm text-gray-600 ml-2">
-            <Star className="w-4 h-4 text-yellow-400 fill-current mr-1" />
-            <span>{machinery.rating}</span>
+          <div>
+            {getAvailabilityBadge()}
           </div>
         </div>
-
-        <p className="text-sm text-gray-600 mb-1">{machinery.manufacturer}</p>
-        <p className="text-xs text-gray-500 mb-3">
-          {machinery.model} • {machinery.series}
-        </p>
 
         {/* Key Specifications */}
-        <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
-          {/* Operating Weight */}
-          {(specs?.cabVersionWeight || specs?.canopyVersionWeight) && (
-            <div>
-              <span className="text-gray-500">Peso:</span>
-              <span className="ml-1 font-medium">
-                {(specs.cabVersionWeight || specs.canopyVersionWeight)?.toFixed(0)} kg
-              </span>
-            </div>
-          )}
+        <div className="space-y-2 text-sm">
+          {/* 2. Region Offerings */}
+          <div className="flex justify-between">
+            <span className="text-gray-500">2. Region:</span>
+            <span className="ml-2 font-medium text-right">
+              {specs?.regionOfferings && specs.regionOfferings.length > 0
+                ? specs.regionOfferings.slice(0, 2).join(', ')
+                : '—'}
+            </span>
+          </div>
           
-          {/* Power */}
-          <div>
-            <span className="text-gray-500">Potencia:</span>
-            <span className="ml-1 font-medium">{specs?.ratedPowerISO9249 || 0} kW</span>
+          {/* 3.1 Canopy Version Weight */}
+          <div className="flex justify-between">
+            <span className="text-gray-500">3.1 Peso Canopy:</span>
+            <span className="ml-2 font-medium">
+              {specs?.canopyVersionWeight?.toFixed(0) || '—'} kg
+            </span>
+          </div>
+          
+          {/* 3.2 Cab Version Weight */}
+          <div className="flex justify-between">
+            <span className="text-gray-500">3.2 Peso Cab:</span>
+            <span className="ml-2 font-medium">
+              {specs?.cabVersionWeight?.toFixed(0) || '—'} kg
+            </span>
           </div>
 
-          {/* Bucket Capacity */}
-          {specs?.bucketCapacity && (
-            <div>
-              <span className="text-gray-500">Balde:</span>
-              <span className="ml-1 font-medium">{specs.bucketCapacity} m³</span>
-            </div>
-          )}
-
-          {/* Fuel */}
-          <div>
-            <span className="text-gray-500">Combustible:</span>
-            <span className="ml-1 font-medium">{specs?.fuelTankCapacity || 0} L</span>
+          {/* 4. Bucket Capacity */}
+          <div className="flex justify-between">
+            <span className="text-gray-500">4. Balde:</span>
+            <span className="ml-2 font-medium">
+              {specs?.bucketCapacity || '—'} m³
+            </span>
           </div>
         </div>
 
