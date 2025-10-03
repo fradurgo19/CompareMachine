@@ -14,6 +14,7 @@ import jointEvaluationRoutes from './routes/jointEvaluation';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/user';
 import initRoutes from './routes/init';
+import textParserRoutes from './routes/textParser';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -97,6 +98,7 @@ app.use('/api/machinery', machineryRoutes);
 app.use('/api/joint-evaluations', jointEvaluationRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/init', initRoutes);
+app.use('/api/text-parser', textParserRoutes);
 
 // Error handling middleware
 app.use(notFound);

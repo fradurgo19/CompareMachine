@@ -253,6 +253,47 @@ class ApiService {
     
     return this.request(endpoint);
   }
+
+  // Extraction endpoints (OpenAI - deprecated due to costs)
+  async extractSpecifications(file: File): Promise<ApiResponse<any[]>> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const url = `${this.baseURL}/extraction/specifications`;
+    const token = localStorage.getItem('authToken');
+
+    const headers: HeadersInit = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Error al extraer especificaciones');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Extraction API request failed:', error);
+      throw error;
+    }
+  }
+
+  // Text parser endpoints (Free alternative to OpenAI)
+  async parseTextSpecifications(text: string): Promise<ApiResponse<any[]>> {
+    return this.request('/text-parser/specifications', {
+      method: 'POST',
+      body: JSON.stringify({ text }),
+    });
+  }
 }
 
 export const apiService = new ApiService();

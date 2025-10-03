@@ -43,26 +43,67 @@ model Machinery {
   // Relations
   specifications MachinerySpecifications?
   userId         String?
-  user           User?            @relation(fields: [userId], references: [id])
+  user           User?                    @relation(fields: [userId], references: [id])
 
   @@unique([name, model])
   @@map("machinery")
 }
 
 model MachinerySpecifications {
-  id                    String  @id @default(cuid())
-  weight                Float
-  power                 Float
-  maxOperatingWeight    Float
-  bucketCapacity        Float?
-  maxDigDepth           Float?
-  maxReach              Float?
-  transportLength       Float
-  transportWidth        Float
-  transportHeight       Float
-  engineModel           String
-  fuelCapacity          Float
-  hydraulicSystem       String?
+  id String @id @default(cuid())
+
+  // Region Offerings
+  regionOfferings String[]
+
+  // Operating Weight Range
+  canopyVersionWeight Float? // kg
+  cabVersionWeight    Float? // kg
+
+  // Bucket Capacity Range (ISO heaped)
+  bucketCapacity Float? // m³
+
+  // Emission Standard
+  emissionStandardEU  String?
+  emissionStandardEPA String?
+
+  // Engine Model
+  engineModel String
+
+  // Rated Power
+  ratedPowerISO9249    Float // kW
+  ratedPowerSAEJ1349   Float? // kW
+  ratedPowerEEC80_1269 Float? // kW
+  numberOfCylinders    Int?
+  boreByStroke         String? // mm (e.g., "88 x 90")
+  pistonDisplacement   Float? // L
+
+  // Relief Valve Settings
+  implementCircuit          Float? // MPa
+  swingCircuit              Float? // MPa
+  travelCircuit             Float? // MPa
+  maxTravelSpeedHigh        Float? // km/h
+  maxTravelSpeedLow         Float? // km/h
+  swingSpeed                Float? // min-1
+  standardTrackShoeWidth    Float? // mm
+  undercarriageLength       Float? // mm
+  undercarriageWidth        Float? // mm (puede ser extend/retract)
+  undercarriageWidthExtend  Float? // mm
+  undercarriageWidthRetract Float? // mm
+
+  // Capacity (Refilled)
+  fuelTankCapacity        Float // L
+  hydraulicSystemCapacity Float? // L
+
+  // Backward compatibility fields (deprecated but kept for migration)
+  weight             Float?
+  power              Float?
+  maxOperatingWeight Float?
+  maxDigDepth        Float?
+  maxReach           Float?
+  transportLength    Float?
+  transportWidth     Float?
+  transportHeight    Float?
+  hydraulicSystem    String?
 
   // Relations
   machineryId String    @unique
@@ -72,25 +113,25 @@ model MachinerySpecifications {
 }
 
 model JointEvaluation {
-  id                        String   @id @default(cuid())
-  joint                     Int
-  standardDiameter          Float
-  structureHousingDiameter  Float
-  bushingDiameter           Float
-  pinDiameter               Float
-  criterion                 Float
-  aeResult                  Int
-  apResult                  Int
-  epResult                  Int
-  beResult                  Int
-  bpResult                  Int
-  criteria                  String[]
-  model                     String
-  series                    String
-  ott                       String
-  photos                    String[]
-  createdAt                 DateTime @default(now())
-  updatedAt                 DateTime @updatedAt
+  id                       String   @id @default(cuid())
+  joint                    Int
+  standardDiameter         Float
+  structureHousingDiameter Float
+  bushingDiameter          Float
+  pinDiameter              Float
+  criterion                Float
+  aeResult                 Int
+  apResult                 Int
+  epResult                 Int
+  beResult                 Int
+  bpResult                 Int
+  criteria                 String[]
+  model                    String
+  series                   String
+  ott                      String
+  photos                   String[]
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
 
   // Relations
   userId String
