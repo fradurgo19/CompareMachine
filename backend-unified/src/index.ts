@@ -89,14 +89,14 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/machinery', machineryRoutes);
-app.use('/api/joint-evaluations', jointEvaluationRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/init', initRoutes);
-app.use('/api/text-parser', textParserRoutes);
-app.use('/api/excel-parser', excelParserRoutes);
+// API Routes (Vercel handles /api prefix via rewrites)
+app.use('/auth', authRoutes);
+app.use('/machinery', machineryRoutes);
+app.use('/joint-evaluations', jointEvaluationRoutes);
+app.use('/users', userRoutes);
+app.use('/init', initRoutes);
+app.use('/text-parser', textParserRoutes);
+app.use('/excel-parser', excelParserRoutes);
 
 // Error handling middleware
 app.use(notFound);
