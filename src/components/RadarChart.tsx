@@ -14,9 +14,9 @@ const RadarChart: React.FC<RadarChartProps> = ({ machinery }) => {
   if (machinery.length === 0) return null;
 
   const categories = [
-    'Peso',
-    'Potencia', 
-    'Combustible',
+    'Implement Circuit (MPa)',
+    'Max. Travel Speed Hi', 
+    'Fuel Tank (L)',
     'Bucket Capacity Range (ISO heaped)',
     'Hydraulic System incl. oil tank (L)'
   ];
@@ -26,16 +26,16 @@ const RadarChart: React.FC<RadarChartProps> = ({ machinery }) => {
   };
 
   const chartData: ChartData[] = machinery.map((machine, index) => {
-    const weight = machine.specifications.cabVersionWeight || machine.specifications.canopyVersionWeight || 0;
-    const power = machine.specifications.ratedPowerISO9249 || 0;
-    const fuel = machine.specifications.fuelTankCapacity || 0;
+    const implementCircuit = machine.specifications.implementCircuit || 0;
+    const maxTravelSpeed = machine.specifications.maxTravelSpeedHigh || 0;
+    const fuelTank = machine.specifications.fuelTankCapacity || 0;
     const bucketCapacity = machine.specifications.bucketCapacity || 0;
     const hydraulicSystem = machine.specifications.hydraulicSystemCapacity || 0;
     
     const values = [
-      normalizeValue(weight, 10000, 0), // Peso normalizado (kg)
-      normalizeValue(power, 100, 0), // Potencia normalizada (kW)
-      normalizeValue(fuel, 200, 0), // Combustible normalizado (L)
+      normalizeValue(implementCircuit, 50, 0), // Implement Circuit normalizado (MPa)
+      normalizeValue(maxTravelSpeed, 10, 0), // Max Travel Speed normalizado (km/h)
+      normalizeValue(fuelTank, 200, 0), // Fuel Tank normalizado (L)
       normalizeValue(bucketCapacity, 5, 0), // Bucket Capacity normalizado (m³)
       normalizeValue(hydraulicSystem, 300, 0) // Hydraulic System normalizado (L)
     ];
