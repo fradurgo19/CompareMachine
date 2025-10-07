@@ -17,8 +17,8 @@ const RadarChart: React.FC<RadarChartProps> = ({ machinery }) => {
     'Peso',
     'Potencia', 
     'Combustible',
-    'Precio',
-    'Calificación'
+    'Bucket Capacity Range (ISO heaped)',
+    'Hydraulic System incl. oil tank (L)'
   ];
 
   const normalizeValue = (value: number, max: number, min: number = 0) => {
@@ -29,13 +29,15 @@ const RadarChart: React.FC<RadarChartProps> = ({ machinery }) => {
     const weight = machine.specifications.cabVersionWeight || machine.specifications.canopyVersionWeight || 0;
     const power = machine.specifications.ratedPowerISO9249 || 0;
     const fuel = machine.specifications.fuelTankCapacity || 0;
+    const bucketCapacity = machine.specifications.bucketCapacity || 0;
+    const hydraulicSystem = machine.specifications.hydraulicSystemCapacity || 0;
     
     const values = [
       normalizeValue(weight, 10000, 0), // Peso normalizado (kg)
       normalizeValue(power, 100, 0), // Potencia normalizada (kW)
       normalizeValue(fuel, 200, 0), // Combustible normalizado (L)
-      normalizeValue(machine.price || 0, 1000000, 0), // Precio normalizado
-      normalizeValue(machine.rating * 20, 100, 0) // Calificación normalizada
+      normalizeValue(bucketCapacity, 5, 0), // Bucket Capacity normalizado (m³)
+      normalizeValue(hydraulicSystem, 300, 0) // Hydraulic System normalizado (L)
     ];
 
     return {
