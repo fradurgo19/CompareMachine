@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../prisma';
 import { createDimensionSchema, updateDimensionSchema, searchDimensionSchema } from '../validators/dimension';
 
-const prisma = new PrismaClient();
+// Log to verify this controller is loaded correctly in Vercel
+console.log('🔧 MachineryDimension Controller Loaded - Version 2025-10-08T18:15:00Z');
 
 /**
  * Get all machinery dimensions with optional search

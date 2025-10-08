@@ -4,9 +4,11 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
-import { PrismaClient } from '@prisma/client';
 import swaggerUi from 'swagger-ui-express';
 // import swaggerDocument from './swagger.json';
+
+// Import Prisma Client
+import { prisma } from './prisma';
 
 // Import routes
 import machineryRoutes from './routes/machinery';
@@ -27,15 +29,6 @@ dotenv.config({ path: './config.env' });
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-
-// Initialize Prisma Client
-export const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL || "postgresql://postgres:password@localhost:5432/compare_machine_db"
-    }
-  }
-});
 
 // Rate limiting - disabled temporarily to avoid IPv6 issues in Vercel
 // const limiter = rateLimit({
@@ -160,3 +153,4 @@ app.listen(PORT, () => {
 });
 
 export default app;
+export { prisma };
