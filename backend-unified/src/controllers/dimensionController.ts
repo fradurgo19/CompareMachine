@@ -75,14 +75,10 @@ export const searchDimensionsByModel = async (req: Request, res: Response) => {
       });
     }
 
-    // Search for dimensions where the model is in the applicableModels array
-    // Using case-insensitive search
-    const dimensions = await prisma.machineryDimension.findMany({
-      where: {
-        applicableModels: {
-          hasSome: [model],
-        },
-      },
+    console.log('🔍 Searching for model:', model);
+
+    // Get all dimensions and filter them
+    const allDimensions = await prisma.machineryDimension.findMany({
       include: {
         user: {
           select: {
@@ -95,43 +91,42 @@ export const searchDimensionsByModel = async (req: Request, res: Response) => {
       orderBy: { createdAt: 'desc' },
     });
 
-    // If no exact match, try fuzzy search
-    if (dimensions.length === 0) {
-      const allDimensions = await prisma.machineryDimension.findMany({
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-        },
-      });
+    console.log('📊 Total dimensions in DB:', allDimensions.length);
 
-      // Filter dimensions that have any model containing the search term (case-insensitive)
-      const fuzzyMatches = allDimensions.filter(dim =>
-        dim.applicableModels.some(m => 
-          m.toLowerCase().includes(model.toLowerCase())
-        )
-      );
+    // Normalize search term: remove spaces, convert to uppercase
+    const normalizedSearch = model.trim().toUpperCase().replace(/\s+/g, '');
+    
+    console.log('🔤 Normalized search term:', normalizedSearch);
 
-      return res.json({
-        success: true,
-        data: fuzzyMatches,
-        meta: {
-          searchType: 'fuzzy',
-          total: fuzzyMatches.length,
-        },
+    // Filter dimensions that have any model matching the search term
+    const matches = allDimensions.filter(dim => {
+      const hasMatch = dim.applicableModels.some(m => {
+        // Normalize model names: remove spaces, convert to uppercase
+        const normalizedModel = m.trim().toUpperCase().replace(/\s+/g, '');
+        
+        // Check for exact match or partial match
+        const exactMatch = normalizedModel === normalizedSearch;
+        const partialMatch = normalizedModel.includes(normalizedSearch) || 
+                            normalizedSearch.includes(normalizedModel);
+        
+        if (exactMatch || partialMatch) {
+          console.log(`✅ Match found: "${m}" matches "${model}"`);
+        }
+        
+        return exactMatch || partialMatch;
       });
-    }
+      
+      return hasMatch;
+    });
+
+    console.log('📋 Matches found:', matches.length);
 
     return res.json({
       success: true,
-      data: dimensions,
+      data: matches,
       meta: {
-        searchType: 'exact',
-        total: dimensions.length,
+        searchTerm: model,
+        total: matches.length,
       },
     });
   } catch (error: any) {
@@ -188,8 +183,12 @@ export const getDimensionById = async (req: Request, res: Response) => {
  */
 export const createDimension = async (req: Request, res: Response) => {
   try {
+    console.log('📝 Creating dimension with data:', JSON.stringify(req.body, null, 2));
+    
     const validatedData = createDimensionSchema.parse(req.body);
     const userId = (req as any).user.id;
+
+    console.log('✅ Validated data:', JSON.stringify(validatedData, null, 2));
 
     const dimension = await prisma.machineryDimension.create({
       data: {
@@ -207,14 +206,17 @@ export const createDimension = async (req: Request, res: Response) => {
       },
     });
 
-    res.status(201).json({
+    console.log('💾 Dimension saved with ID:', dimension.id);
+    console.log('📋 Applicable models saved:', dimension.applicableModels);
+
+    return res.status(201).json({
       success: true,
       data: dimension,
       message: 'Dimension created successfully',
     });
   } catch (error: any) {
     console.error('Error creating dimension:', error);
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: error.message || 'Failed to create dimension',
     });
