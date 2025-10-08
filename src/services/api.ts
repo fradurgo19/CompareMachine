@@ -333,6 +333,64 @@ class ApiService {
     const url = `${this.baseURL}/excel-parser/template`;
     window.open(url, '_blank');
   }
+
+  // Machinery Dimensions endpoints
+  async getDimensions(params?: {
+    page?: number;
+    limit?: number;
+    model?: string;
+  }): Promise<ApiResponse<any[]>> {
+    const queryParams = new URLSearchParams();
+    
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+
+    const queryString = queryParams.toString();
+    const endpoint = queryString ? `/dimensions?${queryString}` : '/dimensions';
+    
+    return this.request(endpoint);
+  }
+
+  async searchDimensions(model: string): Promise<ApiResponse<any[]>> {
+    return this.request(`/dimensions/search/${model}`);
+  }
+
+  async getDimensionById(id: string): Promise<ApiResponse<any>> {
+    return this.request(`/dimensions/${id}`);
+  }
+
+  async createDimension(data: {
+    applicableModels: string[];
+    imageUrl: string;
+    description?: string;
+  }): Promise<ApiResponse<any>> {
+    return this.request('/dimensions', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateDimension(id: string, data: {
+    applicableModels?: string[];
+    imageUrl?: string;
+    description?: string;
+  }): Promise<ApiResponse<any>> {
+    return this.request(`/dimensions/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteDimension(id: string): Promise<ApiResponse<any>> {
+    return this.request(`/dimensions/${id}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const apiService = new ApiService();

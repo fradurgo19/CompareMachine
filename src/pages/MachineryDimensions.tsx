@@ -40,7 +40,12 @@ const MachineryDimensions: React.FC = () => {
   const { data: dimensionsData, isLoading } = useQuery({
     queryKey: ['dimensions', searchModel],
     queryFn: async () => {
-      const response = await api.request(`/dimensions${searchModel ? `/search/${searchModel}` : ''}`);
+      let response;
+      if (searchModel) {
+        response = await api.searchDimensions(searchModel);
+      } else {
+        response = await api.getDimensions();
+      }
       return response.data;
     },
     staleTime: 0, // Always fetch fresh data
@@ -52,7 +57,7 @@ const MachineryDimensions: React.FC = () => {
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
       console.log('➕ Creating dimension with data:', data);
-      const response = await api.request('/dimensions', 'POST', data);
+      const response = await api.createDimension(data);
       console.log('✅ Create response:', response);
       return response;
     },
@@ -75,7 +80,7 @@ const MachineryDimensions: React.FC = () => {
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
       console.log('📝 Updating dimension:', id, 'with data:', data);
-      const response = await api.request(`/dimensions/${id}`, 'PUT', data);
+      const response = await api.updateDimension(id, data);
       console.log('✅ Update response:', response);
       return response;
     },
@@ -97,10 +102,16 @@ const MachineryDimensions: React.FC = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return api.request(`/dimensions/${id}`, 'DELETE');
+      return await api.deleteDimension(id);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['dimensions'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['dimensions'] });
+      await queryClient.refetchQueries({ queryKey: ['dimensions'] });
+      alert('✅ Dimensión eliminada exitosamente!');
+    },
+    onError: (error: any) => {
+      console.error('❌ Delete error:', error);
+      alert(`❌ Error al eliminar: ${error.message || 'Error desconocido'}`);
     },
   });
 
