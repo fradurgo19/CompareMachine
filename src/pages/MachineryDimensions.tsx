@@ -36,13 +36,16 @@ const MachineryDimensions: React.FC = () => {
     description: '',
   });
 
-  // Fetch dimensions
+  // Fetch dimensions - same query config as machinery
   const { data: dimensionsData, isLoading } = useQuery({
     queryKey: ['dimensions', searchModel],
     queryFn: async () => {
       const response = await api.request(`/dimensions${searchModel ? `/search/${searchModel}` : ''}`);
       return response.data;
     },
+    staleTime: 0, // Always fetch fresh data
+    refetchOnMount: 'always', // Refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window regains focus
   });
 
   // Create mutation
@@ -53,9 +56,11 @@ const MachineryDimensions: React.FC = () => {
       console.log('✅ Create response:', response);
       return response;
     },
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       console.log('✅ Create successful, response:', response);
-      queryClient.invalidateQueries({ queryKey: ['dimensions'] });
+      // Invalidate and refetch immediately - same as machinery
+      await queryClient.invalidateQueries({ queryKey: ['dimensions'] });
+      await queryClient.refetchQueries({ queryKey: ['dimensions'] });
       resetForm();
       setIsAddingNew(false);
       alert('✅ Dimensión creada exitosamente!');
@@ -74,9 +79,11 @@ const MachineryDimensions: React.FC = () => {
       console.log('✅ Update response:', response);
       return response;
     },
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       console.log('✅ Update successful, response:', response);
-      queryClient.invalidateQueries({ queryKey: ['dimensions'] });
+      // Invalidate and refetch immediately - same as machinery
+      await queryClient.invalidateQueries({ queryKey: ['dimensions'] });
+      await queryClient.refetchQueries({ queryKey: ['dimensions'] });
       resetForm();
       setEditingId(null);
       alert('✅ Dimensión actualizada exitosamente!');

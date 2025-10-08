@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { prisma } from '../index';
+import { prisma } from '../prisma';
 import { machineryQuerySchema, createMachinerySchema, updateMachinerySchema } from '../validators/machinery';
 import { ApiResponse } from '../types';
 

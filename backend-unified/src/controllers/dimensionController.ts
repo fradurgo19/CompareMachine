@@ -184,16 +184,14 @@ export const getDimensionById = async (req: Request, res: Response) => {
  */
 export const createDimension = async (req: Request, res: Response) => {
   try {
-    console.log('📝 Creating dimension with data:', JSON.stringify(req.body, null, 2));
-    
-    const validatedData = createDimensionSchema.parse(req.body);
+    const data = createDimensionSchema.parse(req.body);
     const userId = (req as any).user.id;
 
-    console.log('✅ Validated data:', JSON.stringify(validatedData, null, 2));
+    console.log('📝 Creating dimension:', data.applicableModels.length, 'models');
 
     const dimension = await prisma.machineryDimension.create({
       data: {
-        ...validatedData,
+        ...data,
         createdBy: userId,
       },
       include: {
@@ -207,19 +205,18 @@ export const createDimension = async (req: Request, res: Response) => {
       },
     });
 
-    console.log('💾 Dimension saved with ID:', dimension.id);
-    console.log('📋 Applicable models saved:', dimension.applicableModels);
+    console.log('✅ Dimension created with ID:', dimension.id);
 
-    return res.status(201).json({
+    res.status(201).json({
       success: true,
       data: dimension,
       message: 'Dimension created successfully',
     });
   } catch (error: any) {
     console.error('Error creating dimension:', error);
-    return res.status(400).json({
+    res.status(500).json({
       success: false,
-      message: error.message || 'Failed to create dimension',
+      message: 'Failed to create dimension'
     });
   }
 };
@@ -230,50 +227,14 @@ export const createDimension = async (req: Request, res: Response) => {
 export const updateDimension = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    
+    const data = updateDimensionSchema.parse(req.body);
+
     console.log('📝 Updating dimension ID:', id);
-    console.log('📥 Request body:', JSON.stringify(req.body, null, 2));
-    
-    const validatedData = updateDimensionSchema.parse(req.body);
-    const userId = (req as any).user.id;
-    const userRole = (req as any).user.role;
-
-    console.log('✅ Validated data:', JSON.stringify(validatedData, null, 2));
-    console.log('👤 User ID:', userId, 'Role:', userRole);
-
-    // Check if dimension exists
-    const existingDimension = await prisma.machineryDimension.findUnique({
-      where: { id },
-    });
-
-    if (!existingDimension) {
-      console.log('❌ Dimension not found');
-      return res.status(404).json({
-        success: false,
-        message: 'Dimension not found',
-      });
-    }
-
-    console.log('📋 Existing dimension:', {
-      id: existingDimension.id,
-      modelsCount: existingDimension.applicableModels.length,
-      models: existingDimension.applicableModels
-    });
-
-    // Check authorization (only creator or admin can update)
-    if (existingDimension.createdBy !== userId && userRole !== 'ADMIN') {
-      console.log('⛔ Unauthorized - User is not creator or admin');
-      return res.status(403).json({
-        success: false,
-        message: 'Unauthorized to update this dimension',
-      });
-    }
-
-    console.log('🔄 Updating dimension with data:', validatedData);
+    console.log('📥 Validated data:', JSON.stringify(data, null, 2));
 
     const dimension = await prisma.machineryDimension.update({
       where: { id },
-      data: validatedData,
+      data: data,
       include: {
         user: {
           select: {
@@ -287,19 +248,17 @@ export const updateDimension = async (req: Request, res: Response) => {
 
     console.log('✅ Dimension updated successfully!');
     console.log('📋 Updated models count:', dimension.applicableModels.length);
-    console.log('📋 Updated models:', dimension.applicableModels);
 
-    return res.json({
+    res.json({
       success: true,
       data: dimension,
       message: 'Dimension updated successfully',
     });
   } catch (error: any) {
     console.error('❌ Error updating dimension:', error);
-    console.error('Stack:', error.stack);
-    return res.status(400).json({
+    res.status(500).json({
       success: false,
-      message: error.message || 'Failed to update dimension',
+      message: 'Failed to update dimension'
     });
   }
 };
@@ -310,42 +269,20 @@ export const updateDimension = async (req: Request, res: Response) => {
 export const deleteDimension = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const userId = (req as any).user.id;
-    const userRole = (req as any).user.role;
-
-    // Check if dimension exists
-    const existingDimension = await prisma.machineryDimension.findUnique({
-      where: { id },
-    });
-
-    if (!existingDimension) {
-      return res.status(404).json({
-        success: false,
-        message: 'Dimension not found',
-      });
-    }
-
-    // Check authorization (only creator or admin can delete)
-    if (existingDimension.createdBy !== userId && userRole !== 'ADMIN') {
-      return res.status(403).json({
-        success: false,
-        message: 'Unauthorized to delete this dimension',
-      });
-    }
 
     await prisma.machineryDimension.delete({
       where: { id },
     });
 
-    return res.json({
+    res.json({
       success: true,
       message: 'Dimension deleted successfully',
     });
   } catch (error: any) {
     console.error('Error deleting dimension:', error);
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
-      message: error.message || 'Failed to delete dimension',
+      message: 'Failed to delete dimension'
     });
   }
 };

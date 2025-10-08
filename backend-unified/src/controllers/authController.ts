@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { prisma } from '../index';
+import { prisma } from '../prisma';
 import { loginSchema, registerSchema } from '../validators/auth';
 import { ApiResponse, AuthResponse } from '../types';
 

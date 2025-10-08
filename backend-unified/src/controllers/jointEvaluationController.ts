@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { prisma } from '../index';
+import { prisma } from '../prisma';
 import { jointEvaluationSchema, jointEvaluationQuerySchema } from '../validators/jointEvaluation';
 import { calculateJointEvaluation } from '../utils/jointCalculations';
 import { ApiResponse } from '../types';
