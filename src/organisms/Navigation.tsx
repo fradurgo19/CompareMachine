@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { GitCompare as Compare, Calculator, Settings, Plus, LogOut, LogIn, UserPlus, User } from 'lucide-react';
+import { GitCompare as Compare, Calculator, Settings, Plus, LogOut, LogIn, UserPlus, User, Ruler } from 'lucide-react';
 import Button from '../atoms/Button';
 import { useAppContext } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
@@ -31,6 +31,12 @@ const Navigation: React.FC = () => {
       path: '/compare',
       label: 'Comparar Maquinaria',
       icon: Compare,
+      requiresAuth: true, // Requires authentication
+    },
+    {
+      path: '/dimensions',
+      label: 'Dimensiones',
+      icon: Ruler,
       requiresAuth: true, // Requires authentication
     },
     {

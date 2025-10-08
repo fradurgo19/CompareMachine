@@ -16,6 +16,7 @@ import userRoutes from './routes/user';
 import initRoutes from './routes/init';
 import textParserRoutes from './routes/textParser';
 import excelParserRoutes from './routes/excelParser';
+import dimensionRoutes from './routes/dimensions';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -97,6 +98,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/init', initRoutes);
 app.use('/api/text-parser', textParserRoutes);
 app.use('/api/excel-parser', excelParserRoutes);
+app.use('/api/dimensions', dimensionRoutes);
 
 // Error handling middleware
 app.use(notFound);

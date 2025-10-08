@@ -20,8 +20,9 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  jointEvaluations JointEvaluation[]
-  machinery        Machinery[]
+  jointEvaluations     JointEvaluation[]
+  machinery            Machinery[]
+  machineryDimensions  MachineryDimension[]
 
   @@map("users")
 }
@@ -141,6 +142,21 @@ model JointEvaluation {
 
   @@unique([joint, userId])
   @@map("joint_evaluations")
+}
+
+model MachineryDimension {
+  id               String   @id @default(cuid())
+  applicableModels String[] // Array of machinery models that use this dimension image
+  imageUrl         String   // URL from Cloudinary or other cloud storage
+  description      String?  // Optional description
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  createdBy String
+  user      User   @relation(fields: [createdBy], references: [id])
+
+  @@map("machinery_dimensions")
 }
 
 enum UserRole {

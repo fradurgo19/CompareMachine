@@ -9,6 +9,7 @@ import Landing from './pages/Landing';
 import MachineryComparison from './pages/MachineryComparison';
 import CriteriaEvaluation from './pages/CriteriaEvaluation';
 import AddMachinery from './pages/AddMachinery';
+import MachineryDimensions from './pages/MachineryDimensions';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AuthGuard from './components/AuthGuard';
@@ -41,6 +42,15 @@ function App() {
                       <AuthGuard>
                         <Navigation />
                         <MachineryComparison />
+                      </AuthGuard>
+                    } 
+                  />
+                  <Route 
+                    path="/dimensions" 
+                    element={
+                      <AuthGuard>
+                        <Navigation />
+                        <MachineryDimensions />
                       </AuthGuard>
                     } 
                   />
