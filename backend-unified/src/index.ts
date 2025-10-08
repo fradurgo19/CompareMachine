@@ -90,6 +90,41 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Diagnostic endpoint for checking environment configuration
+app.get('/api/diagnostic/env', async (req, res) => {
+  try {
+    const dbUrl = process.env.DATABASE_URL || 'NOT SET';
+    const maskedUrl = dbUrl.replace(/:[^:@]+@/, ':****@'); // Mask password
+    
+    // Test database connection
+    let dbConnected = false;
+    let dimensionsCount = 0;
+    try {
+      dimensionsCount = await prisma.machineryDimension.count();
+      dbConnected = true;
+    } catch (error: any) {
+      console.error('DB Connection test failed:', error.message);
+    }
+    
+    res.json({
+      success: true,
+      environment: {
+        NODE_ENV: process.env.NODE_ENV || 'NOT SET',
+        DATABASE_URL: maskedUrl,
+        DATABASE_CONNECTED: dbConnected,
+        DIMENSIONS_COUNT: dimensionsCount,
+        JWT_SECRET: process.env.JWT_SECRET ? 'SET' : 'NOT SET',
+        CORS_ORIGIN: process.env.CORS_ORIGIN || 'NOT SET'
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/machinery', machineryRoutes);
