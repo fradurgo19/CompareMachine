@@ -50,18 +50,18 @@ interface JointEvaluationData {
 }
 
 export const exportToPDF = (evaluations: JointEvaluationData[]) => {
-  // Create new PDF document
-  const doc = new jsPDF('portrait', 'mm', 'a4');
+  // Create new PDF document in LANDSCAPE for better table fit
+  const doc = new jsPDF('landscape', 'mm', 'a4');
   
   // Add title
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
-  doc.text('EVALUACIÓN DE ARTICULACIONES', 105, 15, { align: 'center' });
+  doc.text('EVALUACIÓN DE ARTICULACIONES', 148, 15, { align: 'center' });
   
   // Add subtitle
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  doc.text('Análisis integral con datos completos de pasadores, bujes y arandelas', 105, 22, { align: 'center' });
+  doc.text('Análisis integral con datos completos de pasadores, bujes y arandelas', 148, 22, { align: 'center' });
   
   // Add generation date
   const currentDate = new Date().toLocaleDateString('es-ES', {
@@ -71,7 +71,7 @@ export const exportToPDF = (evaluations: JointEvaluationData[]) => {
     hour: '2-digit',
     minute: '2-digit'
   });
-  doc.text(`Generado el: ${currentDate}`, 105, 28, { align: 'center' });
+  doc.text(`Generado el: ${currentDate}`, 148, 28, { align: 'center' });
   
   // Prepare table data
   const tableData = evaluations.map(evaluation => [
@@ -137,22 +137,22 @@ export const exportToPDF = (evaluations: JointEvaluationData[]) => {
       fillColor: [245, 245, 245] // Light gray
     },
     columnStyles: {
-      0: { halign: 'center', cellWidth: 12 }, // ARTICULACIÓN
+      0: { halign: 'center', cellWidth: 15 }, // ARTICULACIÓN
       1: { halign: 'center', cellWidth: 15 }, // CRITERIO
-      2: { halign: 'center', cellWidth: 18 }, // DIÁM. ESTÁNDAR
-      3: { halign: 'center', cellWidth: 18 }, // DIÁM. ALOJAMIENTO
-      4: { halign: 'center', cellWidth: 16 }, // DIÁM. BOCINA
-      5: { halign: 'center', cellWidth: 14 }, // DIÁM. PIN
-      6: { halign: 'center', cellWidth: 10 }, // A-E
-      7: { halign: 'center', cellWidth: 10 }, // A-P
-      8: { halign: 'center', cellWidth: 10 }, // E-P
-      9: { halign: 'center', cellWidth: 10 }, // B-E
-      10: { halign: 'center', cellWidth: 10 }, // B-P
-      11: { halign: 'left', cellWidth: 30 }, // CRITERIOS
-      12: { halign: 'center', cellWidth: 18 }, // MODELO
-      13: { halign: 'center', cellWidth: 15 }, // SERIE
+      2: { halign: 'center', cellWidth: 20 }, // DIÁM. ESTÁNDAR
+      3: { halign: 'center', cellWidth: 22 }, // DIÁM. ALOJAMIENTO
+      4: { halign: 'center', cellWidth: 20 }, // DIÁM. BOCINA
+      5: { halign: 'center', cellWidth: 18 }, // DIÁM. PIN
+      6: { halign: 'center', cellWidth: 12 }, // A-E
+      7: { halign: 'center', cellWidth: 12 }, // A-P
+      8: { halign: 'center', cellWidth: 12 }, // E-P
+      9: { halign: 'center', cellWidth: 12 }, // B-E
+      10: { halign: 'center', cellWidth: 12 }, // B-P
+      11: { halign: 'left', cellWidth: 40 }, // CRITERIOS
+      12: { halign: 'center', cellWidth: 20 }, // MODELO
+      13: { halign: 'center', cellWidth: 18 }, // SERIE
       14: { halign: 'center', cellWidth: 15 }, // OTT
-      15: { halign: 'left', cellWidth: 25 } // FOTOS
+      15: { halign: 'left', cellWidth: 20 } // FOTOS
     },
     margin: { top: 35, right: 14, bottom: 14, left: 14 },
     tableWidth: 'auto',
@@ -168,7 +168,7 @@ export const exportToPDF = (evaluations: JointEvaluationData[]) => {
   currentY = 20;
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('DETALLES DE PASADOR, BUJE Y ARANDELA', 105, currentY, { align: 'center' });
+  doc.text('DETALLES DE PASADOR, BUJE Y ARANDELA', 148, currentY, { align: 'center' });
   currentY += 10;
   
   evaluations.forEach((evaluation, index) => {
@@ -181,7 +181,7 @@ export const exportToPDF = (evaluations: JointEvaluationData[]) => {
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.setFillColor(41, 128, 185);
-    doc.rect(14, currentY - 5, 182, 8, 'F');
+    doc.rect(14, currentY - 5, 268, 8, 'F');
     doc.setTextColor(255, 255, 255);
     doc.text(`Articulación #${evaluation.joint} - ${evaluation.model || 'Sin modelo'} (${evaluation.series || 'Sin serie'})`, 16, currentY);
     doc.setTextColor(0, 0, 0);
@@ -260,7 +260,7 @@ export const exportToPDF = (evaluations: JointEvaluationData[]) => {
     
     // Separator line
     doc.setDrawColor(200, 200, 200);
-    doc.line(14, currentY, 196, currentY);
+    doc.line(14, currentY, 282, currentY);
     currentY += 8;
   });
   
