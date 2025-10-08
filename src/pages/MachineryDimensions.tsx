@@ -48,24 +48,42 @@ const MachineryDimensions: React.FC = () => {
   // Create mutation
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
-      return api.request('/dimensions', 'POST', data);
+      console.log('➕ Creating dimension with data:', data);
+      const response = await api.request('/dimensions', 'POST', data);
+      console.log('✅ Create response:', response);
+      return response;
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
+      console.log('✅ Create successful, response:', response);
       queryClient.invalidateQueries({ queryKey: ['dimensions'] });
       resetForm();
       setIsAddingNew(false);
+      alert('✅ Dimensión creada exitosamente!');
+    },
+    onError: (error: any) => {
+      console.error('❌ Create error:', error);
+      alert(`❌ Error al crear: ${error.message || 'Error desconocido'}`);
     },
   });
 
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      return api.request(`/dimensions/${id}`, 'PUT', data);
+      console.log('📝 Updating dimension:', id, 'with data:', data);
+      const response = await api.request(`/dimensions/${id}`, 'PUT', data);
+      console.log('✅ Update response:', response);
+      return response;
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
+      console.log('✅ Update successful, response:', response);
       queryClient.invalidateQueries({ queryKey: ['dimensions'] });
       resetForm();
       setEditingId(null);
+      alert('✅ Dimensión actualizada exitosamente!');
+    },
+    onError: (error: any) => {
+      console.error('❌ Update error:', error);
+      alert(`❌ Error al actualizar: ${error.message || 'Error desconocido'}`);
     },
   });
 
@@ -100,18 +118,28 @@ const MachineryDimensions: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    const modelsArray = formData.applicableModels
+      .split(',')
+      .map(m => m.trim())
+      .filter(m => m.length > 0);
+    
     const data = {
-      applicableModels: formData.applicableModels
-        .split(',')
-        .map(m => m.trim())
-        .filter(m => m.length > 0),
+      applicableModels: modelsArray,
       imageUrl: formData.imageUrl.trim(),
       description: formData.description.trim() || undefined,
     };
 
+    console.log('📝 Form submitted');
+    console.log('📋 Models count:', modelsArray.length);
+    console.log('📋 Models:', modelsArray);
+    console.log('🔗 Image URL:', data.imageUrl);
+    console.log('📝 Description:', data.description);
+
     if (editingId) {
+      console.log('🔄 Updating dimension ID:', editingId);
       updateMutation.mutate({ id: editingId, data });
     } else {
+      console.log('➕ Creating new dimension');
       createMutation.mutate(data);
     }
   };

@@ -229,9 +229,16 @@ export const createDimension = async (req: Request, res: Response) => {
 export const updateDimension = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    
+    console.log('📝 Updating dimension ID:', id);
+    console.log('📥 Request body:', JSON.stringify(req.body, null, 2));
+    
     const validatedData = updateDimensionSchema.parse(req.body);
     const userId = (req as any).user.id;
     const userRole = (req as any).user.role;
+
+    console.log('✅ Validated data:', JSON.stringify(validatedData, null, 2));
+    console.log('👤 User ID:', userId, 'Role:', userRole);
 
     // Check if dimension exists
     const existingDimension = await prisma.machineryDimension.findUnique({
@@ -239,19 +246,29 @@ export const updateDimension = async (req: Request, res: Response) => {
     });
 
     if (!existingDimension) {
+      console.log('❌ Dimension not found');
       return res.status(404).json({
         success: false,
         message: 'Dimension not found',
       });
     }
 
+    console.log('📋 Existing dimension:', {
+      id: existingDimension.id,
+      modelsCount: existingDimension.applicableModels.length,
+      models: existingDimension.applicableModels
+    });
+
     // Check authorization (only creator or admin can update)
     if (existingDimension.createdBy !== userId && userRole !== 'ADMIN') {
+      console.log('⛔ Unauthorized - User is not creator or admin');
       return res.status(403).json({
         success: false,
         message: 'Unauthorized to update this dimension',
       });
     }
+
+    console.log('🔄 Updating dimension with data:', validatedData);
 
     const dimension = await prisma.machineryDimension.update({
       where: { id },
@@ -267,13 +284,18 @@ export const updateDimension = async (req: Request, res: Response) => {
       },
     });
 
+    console.log('✅ Dimension updated successfully!');
+    console.log('📋 Updated models count:', dimension.applicableModels.length);
+    console.log('📋 Updated models:', dimension.applicableModels);
+
     return res.json({
       success: true,
       data: dimension,
       message: 'Dimension updated successfully',
     });
   } catch (error: any) {
-    console.error('Error updating dimension:', error);
+    console.error('❌ Error updating dimension:', error);
+    console.error('Stack:', error.stack);
     return res.status(400).json({
       success: false,
       message: error.message || 'Failed to update dimension',
