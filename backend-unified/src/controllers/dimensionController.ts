@@ -43,6 +43,12 @@ export const getDimensions = async (req: Request, res: Response) => {
       prisma.machineryDimension.count({ where }),
     ]);
 
+    // Disable HTTP cache to always get fresh data from database
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+
     res.json({
       success: true,
       data: dimensions,
@@ -121,6 +127,12 @@ export const searchDimensionsByModel = async (req: Request, res: Response) => {
     });
 
     console.log('📋 Matches found:', matches.length);
+
+    // Disable HTTP cache to always get fresh data from database
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
 
     return res.json({
       success: true,
