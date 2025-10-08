@@ -126,7 +126,7 @@ export const searchDimensionsByModel = async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       data: dimensions,
       meta: {
@@ -136,7 +136,7 @@ export const searchDimensionsByModel = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error('Error searching dimensions:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message || 'Failed to search dimensions',
     });
@@ -170,13 +170,13 @@ export const getDimensionById = async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       data: dimension,
     });
   } catch (error: any) {
     console.error('Error getting dimension:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message || 'Failed to fetch dimension',
     });
@@ -265,14 +265,14 @@ export const updateDimension = async (req: Request, res: Response) => {
       },
     });
 
-    res.json({
+    return res.json({
       success: true,
       data: dimension,
       message: 'Dimension updated successfully',
     });
   } catch (error: any) {
     console.error('Error updating dimension:', error);
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: error.message || 'Failed to update dimension',
     });
@@ -312,13 +312,13 @@ export const deleteDimension = async (req: Request, res: Response) => {
       where: { id },
     });
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Dimension deleted successfully',
     });
   } catch (error: any) {
     console.error('Error deleting dimension:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message || 'Failed to delete dimension',
     });

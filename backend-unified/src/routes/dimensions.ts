@@ -7,7 +7,7 @@ import {
   updateDimension,
   deleteDimension,
 } from '../controllers/dimensionController';
-import { authenticate } from '../middleware/auth';
+import { authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -17,9 +17,9 @@ router.get('/search/:model', searchDimensionsByModel);
 router.get('/:id', getDimensionById);
 
 // Protected routes (require authentication)
-router.post('/', authenticate, createDimension);
-router.put('/:id', authenticate, updateDimension);
-router.delete('/:id', authenticate, deleteDimension);
+router.post('/', authenticateToken, createDimension);
+router.put('/:id', authenticateToken, updateDimension);
+router.delete('/:id', authenticateToken, deleteDimension);
 
 export default router;
 
