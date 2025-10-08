@@ -8,6 +8,15 @@ declare module 'jspdf' {
   }
 }
 
+interface PinType {
+  oreja: string;
+  orejaUrl: string;
+  sujecion: string;
+  sujecionUrl: string;
+  lubricacion: string;
+  lubricacionUrl: string;
+}
+
 interface JointEvaluationData {
   joint: number;
   criterion: number;
@@ -26,21 +35,33 @@ interface JointEvaluationData {
   ott: string;
   photos?: string;
   photosBase64?: string[];
+  // Pin data
+  pinType?: PinType;
+  pinDiameterValue?: number;
+  pinLength?: number;
+  // Bushing data
+  bushingInnerDiameter?: number;
+  bushingOuterDiameter?: number;
+  bushingLength?: number;
+  // Washer data
+  washerInnerDiameter?: number;
+  washerOuterDiameter?: number;
+  washerLength?: number;
 }
 
 export const exportToPDF = (evaluations: JointEvaluationData[]) => {
   // Create new PDF document
-  const doc = new jsPDF('landscape', 'mm', 'a4');
+  const doc = new jsPDF('portrait', 'mm', 'a4');
   
   // Add title
-  doc.setFontSize(18);
+  doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
-  doc.text('CRITERIOS PARA EVALUACIÓN DE ARTICULACIONES', 14, 15);
+  doc.text('EVALUACIÓN DE ARTICULACIONES', 105, 15, { align: 'center' });
   
   // Add subtitle
-  doc.setFontSize(12);
+  doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  doc.text('Análisis integral con cálculos automatizados para evaluaciones de articulaciones de maquinaria', 14, 22);
+  doc.text('Análisis integral con datos completos de pasadores, bujes y arandelas', 105, 22, { align: 'center' });
   
   // Add generation date
   const currentDate = new Date().toLocaleDateString('es-ES', {
@@ -50,7 +71,7 @@ export const exportToPDF = (evaluations: JointEvaluationData[]) => {
     hour: '2-digit',
     minute: '2-digit'
   });
-  doc.text(`Generado el: ${currentDate}`, 14, 29);
+  doc.text(`Generado el: ${currentDate}`, 105, 28, { align: 'center' });
   
   // Prepare table data
   const tableData = evaluations.map(evaluation => [
@@ -138,9 +159,110 @@ export const exportToPDF = (evaluations: JointEvaluationData[]) => {
     showHead: 'everyPage'
   });
   
-  // Add photos section
-  const finalY = (doc as any).lastAutoTable?.finalY || 35;
+  // Add detailed information section
+  let finalY = (doc as any).lastAutoTable?.finalY || 35;
   let currentY = finalY + 10;
+  
+  // Add Pin, Bushing and Washer Details Section
+  doc.addPage();
+  currentY = 20;
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text('DETALLES DE PASADOR, BUJE Y ARANDELA', 105, currentY, { align: 'center' });
+  currentY += 10;
+  
+  evaluations.forEach((evaluation, index) => {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    // Articulation header
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setFillColor(41, 128, 185);
+    doc.rect(14, currentY - 5, 182, 8, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.text(`Articulación #${evaluation.joint} - ${evaluation.model || 'Sin modelo'} (${evaluation.series || 'Sin serie'})`, 16, currentY);
+    doc.setTextColor(0, 0, 0);
+    currentY += 10;
+    
+    // Pin Type Details with Images
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Tipo de Pasador:', 16, currentY);
+    currentY += 6;
+    
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    
+    // Oreja
+    doc.text(`• Oreja: ${evaluation.pinType?.oreja || 'No seleccionado'}`, 20, currentY);
+    if (evaluation.pinType?.orejaUrl) {
+      try {
+        doc.addImage(evaluation.pinType.orejaUrl, 'PNG', 70, currentY - 4, 20, 15);
+      } catch (error) {
+        doc.text('[Imagen no disponible]', 70, currentY);
+      }
+    }
+    currentY += 18;
+    
+    // Sujeción
+    doc.text(`• Sujeción: ${evaluation.pinType?.sujecion || 'No seleccionado'}`, 20, currentY);
+    if (evaluation.pinType?.sujecionUrl) {
+      try {
+        doc.addImage(evaluation.pinType.sujecionUrl, 'PNG', 70, currentY - 4, 20, 15);
+      } catch (error) {
+        doc.text('[Imagen no disponible]', 70, currentY);
+      }
+    }
+    currentY += 18;
+    
+    // Lubricación
+    doc.text(`• Lubricación: ${evaluation.pinType?.lubricacion || 'No seleccionado'}`, 20, currentY);
+    if (evaluation.pinType?.lubricacionUrl) {
+      try {
+        doc.addImage(evaluation.pinType.lubricacionUrl, 'PNG', 70, currentY - 4, 20, 15);
+      } catch (error) {
+        doc.text('[Imagen no disponible]', 70, currentY);
+      }
+    }
+    currentY += 20;
+    
+    // Pin Measurements
+    doc.setFont('helvetica', 'bold');
+    doc.text('Medidas del Pasador:', 16, currentY);
+    currentY += 5;
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Diámetro: ${evaluation.pinDiameterValue?.toFixed(2) || '0.00'} mm`, 20, currentY);
+    doc.text(`Longitud: ${evaluation.pinLength?.toFixed(2) || '0.00'} mm`, 80, currentY);
+    currentY += 8;
+    
+    // Bushing Details
+    doc.setFont('helvetica', 'bold');
+    doc.text('Buje:', 16, currentY);
+    currentY += 5;
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Ø Interno: ${evaluation.bushingInnerDiameter?.toFixed(2) || '0.00'} mm`, 20, currentY);
+    doc.text(`Ø Externo: ${evaluation.bushingOuterDiameter?.toFixed(2) || '0.00'} mm`, 80, currentY);
+    doc.text(`Longitud: ${evaluation.bushingLength?.toFixed(2) || '0.00'} mm`, 140, currentY);
+    currentY += 8;
+    
+    // Washer Details
+    doc.setFont('helvetica', 'bold');
+    doc.text('Arandela de Ajuste:', 16, currentY);
+    currentY += 5;
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Ø Interno: ${evaluation.washerInnerDiameter?.toFixed(2) || '0.00'} mm`, 20, currentY);
+    doc.text(`Ø Externo: ${evaluation.washerOuterDiameter?.toFixed(2) || '0.00'} mm`, 80, currentY);
+    doc.text(`Longitud: ${evaluation.washerLength?.toFixed(2) || '0.00'} mm`, 140, currentY);
+    currentY += 12;
+    
+    // Separator line
+    doc.setDrawColor(200, 200, 200);
+    doc.line(14, currentY, 196, currentY);
+    currentY += 8;
+  });
   
   // Add photos section
   const evaluationsWithPhotos = evaluations.filter(e => e.photosBase64 && e.photosBase64.length > 0);
